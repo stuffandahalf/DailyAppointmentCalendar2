@@ -8,12 +8,17 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.*;
 import java.awt.Dimension;
+import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.Collections;
 import java.util.Arrays;
+import java.util.Locale;
+import java.time.DayOfWeek;
+import java.time.format.TextStyle;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,13 +38,15 @@ import javax.swing.JOptionPane;
 public class AppointmentFrame extends JFrame
 {
     //instance variables for window size
-    private final int WINDOW_WIDTH = 600;
+    private final int WINDOW_WIDTH = 800;
     private final int WINDOW_HEIGHT = 600;
     
     //variables used for the appointments
     private Calendar date;
     private SimpleDateFormat sdf;
+    private SimpleDateFormat sdfMonth;
     private ArrayList<Appointment> appointments;
+    private Stack<Appointment> appointmentsStack;
     
     //gui instance variables
     private JPanel centralPanel;
@@ -132,7 +139,9 @@ public class AppointmentFrame extends JFrame
         super();                                                                        //call superclass constructor
         date = new GregorianCalendar();                                                 //initialize variable date as a pointer to a new GregorianCalendar object
         sdf = new SimpleDateFormat("EEE, MMM dd, yyyy");                                //initialize variable sdf as a pointer to a new SimpleDateFormat
+        sdfMonth = new SimpleDateFormat("MMM");
         appointments = new ArrayList<Appointment>();                                    //initialize appointments as a pointer to a new ArrayList for storing Appointment objects
+        appointmentsStack = new Stack<Appointment>();                                   //initialize appointmentsStack as a pointer to a new stack to store Appointment objects as they are added
         
         centralPanel = new JPanel(new GridLayout(1, 2));
         add(centralPanel);
@@ -248,6 +257,7 @@ public class AppointmentFrame extends JFrame
             public void actionPerformed(ActionEvent evt)                                //override the actionPerformed method
             {
                 date.add(Calendar.DAY_OF_MONTH, -1);                                    //add -1 days to the current date
+                monthLabel.setText(sdfMonth.format(date.getTime()));
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
@@ -269,6 +279,7 @@ public class AppointmentFrame extends JFrame
             public void actionPerformed(ActionEvent evt)                                //create a nested class to implement the ActionListener interface
             {
                 date.add(Calendar.DAY_OF_MONTH, 1);                                     //add 1 day to the current date
+                monthLabel.setText(sdfMonth.format(date.getTime()));
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
@@ -308,6 +319,7 @@ public class AppointmentFrame extends JFrame
                 yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
                 monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
                 dayInput.setText(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));
+                monthLabel.setText(sdfMonth.format(date.getTime()));
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
                 getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
             }
@@ -412,6 +424,7 @@ public class AppointmentFrame extends JFrame
                         Appointment newAppointment = new Appointment(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute), description.getText());    //make a new appointment at the given time
                         description.setText("");                                        //clear the description text box
                         appointments.add(newAppointment);                               //add the new appointment to the ArrayList
+                        appointmentsStack.push(newAppointment);                         //add the new appointment to the Stack
                     }
                     getTodaysAppointments();                                            //run the getTodaysAppointments method to print them to the screen
                 }
@@ -454,6 +467,14 @@ public class AppointmentFrame extends JFrame
                             break;                                                      //break the loop
                         }
                     }
+                    for(int i = 0; i < appointmentsStack.size(); i++)
+                    {
+                        if(appointmentsStack.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))
+                        {
+                            appointmentsStack.remove(i);
+                            break;
+                        }
+                    }
                     getTodaysAppointments();                                            //run the getTodaysAppointments method to display the remaining appointments
                 }
             }
@@ -469,7 +490,37 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent evt)
             {
-                
+                if(!appointmentsStack.empty())
+                {
+                    //SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd, yyyy");
+                    //System.out.println("Recall button was pressed, replace later");
+                    Appointment lastAppointment = appointmentsStack.peek();
+                    Calendar appointmentDate = lastAppointment.getDate();
+                    int day = appointmentDate.get(Calendar.DAY_OF_MONTH);
+                    int month = appointmentDate.get(Calendar.MONTH) + 1;
+                    int year = appointmentDate.get(Calendar.YEAR);
+                    int hour = appointmentDate.get(Calendar.HOUR_OF_DAY);
+                    int minutes = appointmentDate.get(Calendar.MINUTE);
+                    //System.out.println(minutes);
+                    dayInput.setText(Integer.toString(day));
+                    monthInput.setText(Integer.toString(month));
+                    yearInput.setText(Integer.toString(year));
+                    hourInput.setText(Integer.toString(hour));
+                    minuteInput.setText(Integer.toString(minutes));
+                    date = appointmentDate;
+                    monthLabel.setText(sdfMonth.format(date.getTime()));
+                    dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
+                    getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
+            
+                }
+                else
+                {
+                    dayInput.setText("");
+                    monthInput.setText("");
+                    yearInput.setText("");
+                    hourInput.setText("");
+                    minuteInput.setText("");
+                }
             }
         }
         recallButton.addActionListener(new RecallButtonListener());
@@ -555,6 +606,7 @@ public class AppointmentFrame extends JFrame
                     if(create)                                                              //if create was not set to false
                     {
                         appointments.add(samples[j]);                                       //add the new appointment to the ArrayList
+                        appointmentsStack.push(samples[j]);                                 //add the new appointment to the Stack
                         message += sampleFormat.format(samples[j].getDate().getTime());     //add the sample date to the message
                         message += "\n";                                                    //add a newline character to the message
                     }
@@ -571,36 +623,61 @@ public class AppointmentFrame extends JFrame
 
     private void createMonthLabel()
     {
-        SimpleDateFormat sdfMonth = new SimpleDateFormat("MMM");
         monthLabel = new JLabel(sdfMonth.format(date.getTime()));
         rightPanel.add(monthLabel, BorderLayout.NORTH);
     }
     
     private void createCalendar()
     {
-        calendarPanel = new JPanel();//new BorderLayout());
+        calendarPanel = new JPanel(new BorderLayout());
         
         calendarSubPanelA = new JPanel(new GridLayout(1, 7));
         for(int i = 0; i < 7; i++)
         {
-            calendarSubPanelA.add(new JLabel(Integer.toString(i)));
+            if(i != 0)
+            {
+                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[i-1].getDisplayName(TextStyle.SHORT, Locale.CANADA)));
+            }
+            else
+            {
+                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[6].getDisplayName(TextStyle.SHORT, Locale.CANADA)));
+            }
         }
-        calendarPanel.add(calendarSubPanelA);//, BorderLayout.NORTH);
+        calendarPanel.add(calendarSubPanelA, BorderLayout.NORTH);
         
         calendarSubPanelB = new JPanel(new GridLayout(5, 7));
         int currentYear = date.get(Calendar.YEAR);
         int currentMonth = date.get(Calendar.MONTH);
         int previousMonth = currentMonth - 1;
         int nextMonth = currentMonth + 1;
+        int currentDay = date.get(Calendar.DAY_OF_WEEK);
         int numberOfDays = date.getActualMaximum(Calendar.DAY_OF_MONTH);
-        //ArrayList<JButton> calendarButtons = new ArrayList<JButton>;
-        for(int i = 1; i <= numberOfDays; i++)
+        //Calendar currentMonthCalendar = new GregorianCalendar(
+        //for(int i = 1; i <= numberOfDays; i++)
+        for(int i = 1; i <= 35; i++)
         {
-            calendarSubPanelB.add(new JButton(Integer.toString(i)));
-            //calendarButtons.add(new JButton(i));
-            //System.out.println(i);
+            JButton calendarButton = new JButton(Integer.toString(i));
+            if(currentDay == Integer.parseInt(calendarButton.getText()))
+            {
+                calendarButton.setBackground(Color.RED);
+            }
+            class CalendarButtonListener implements ActionListener
+            {
+                private int index;
+                public CalendarButtonListener(int i)
+                {
+                    this.index = i;
+                }
+                
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("Button " + index + " was pressed, replace later");
+                }
+            }
+            calendarButton.addActionListener(new CalendarButtonListener(i));
+            calendarSubPanelB.add(calendarButton);
         }
-        calendarPanel.add(calendarSubPanelB);//, BorderLayout.SOUTH);
+        calendarPanel.add(calendarSubPanelB, BorderLayout.CENTER);
         rightPanel.add(calendarPanel);
     }
     
