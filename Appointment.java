@@ -25,6 +25,16 @@ public class Appointment implements Comparable<Appointment>                     
         person = new Person(lastName, firstName, telephone, address, email);
     }
     
+    public Person getPerson()
+    {
+        return person;
+    }
+    
+    public void setPerson(String lastName, String firstName, String telephone, String address, String email)
+    {
+        person = new Person(lastName, firstName, telephone, address, email);
+    }
+    
     /**
      * method to return the
      * description of the

@@ -24,7 +24,7 @@ public class Person implements Comparable<Person>
     
     public int compareTo(Person other)
     {
-        if(lastName == other.lastName)
+        if(lastName.equals(other.lastName))
         {
             return(firstName.compareTo(other.firstName));
         }

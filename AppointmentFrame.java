@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 public class AppointmentFrame extends JFrame
 {
     //instance variables for window size
-    private final int WINDOW_WIDTH = 300;
+    private final int WINDOW_WIDTH = 600;
     private final int WINDOW_HEIGHT = 600;
     
     //variables used for the appointments
@@ -42,6 +42,13 @@ public class AppointmentFrame extends JFrame
     private ArrayList<Appointment> appointments;
     
     //gui instance variables
+    private JPanel centralPanel;
+    
+    private JPanel leftPanel;
+    private JPanel rightPanel;
+    
+    
+    //leftpanel instance variables
     private JLabel dateLabel;
     private JTextArea textArea;
     
@@ -57,37 +64,65 @@ public class AppointmentFrame extends JFrame
     private JButton rightButton;
     
     private JPanel subDatePanelB;
-    private JLabel monthLabel;
+    private JLabel monthInputLabel;
     private JTextField monthInput;
-    private JLabel dayLabel;
+    private JLabel dayInputLabel;
     private JTextField dayInput;
-    private JLabel yearLabel;
+    private JLabel yearInputLabel;
     private JTextField yearInput;
     
     private JPanel subDatePanelC;
     private JButton showButton;
     
-    private TitledBorder actionBorder;
-    private JPanel actionPanel;
+    private TitledBorder appointmentBorder;
+    private JPanel appointmentPanel;
     
-    private JPanel subActionPanelA;
+    private JPanel subAppointmentPanelA;
     private JLabel hourLabel;
     private JLabel minuteLabel;
     private JTextField hourInput;
     private JTextField minuteInput;
     
-    private JPanel subActionPanelB;
+    private JPanel subAppointmentPanelB;
     private JButton createButton;
     private JButton cancelButton;
-    
-    private JPanel descriptionPanel;
-    private TitledBorder descriptionBorder;
-    private JTextArea description;
+    private JButton recallButton;
     
     private JMenuBar menuBar;
     private JMenu manageMenu;
     private JMenuItem clearAppointments;
     private JMenuItem addSampleAppointments;
+    
+    //rightPanel instance variables
+    private JLabel monthLabel;
+    
+    private JPanel calendarPanel;
+    private JPanel calendarSubPanelA;
+    private JPanel calendarSubPanelB;
+    
+    private JPanel contactDescriptionPanel;
+    
+    private JPanel contactPanel;
+    private JPanel contactSubPanelA;
+    private TitledBorder contactBorder;
+    private JLabel lastNameLabel;
+    private JTextField lastNameInput;
+    private JLabel firstNameLabel;
+    private JTextField firstNameInput;
+    private JLabel telephoneLabel;
+    private JTextField telephoneInput;
+    private JLabel emailLabel;
+    private JTextField emailInput;
+    private JPanel contactSubPanelB;
+    private JLabel addressLabel;
+    private JTextField addressInput;
+    private JPanel contactSubPanelC;
+    private JButton findButton;
+    private JButton clearButton;
+    
+    private JPanel descriptionPanel;
+    private TitledBorder descriptionBorder;
+    private JTextArea description;
     
     /**
      * constructor for the frame
@@ -99,24 +134,44 @@ public class AppointmentFrame extends JFrame
         sdf = new SimpleDateFormat("EEE, MMM dd, yyyy");                                //initialize variable sdf as a pointer to a new SimpleDateFormat
         appointments = new ArrayList<Appointment>();                                    //initialize appointments as a pointer to a new ArrayList for storing Appointment objects
         
-        createLabel();                                                                  //run createLabel method
-        createTextArea();                                                               //run createTextArea method
-        createControlPanel();                                                           //run createControlPanel method
-        createMenuBar();                                                                //run createMenuBar method
+        centralPanel = new JPanel(new GridLayout(1, 2));
+        add(centralPanel);
+        
+        leftPanel = new JPanel(new BorderLayout());
+        centralPanel.add(leftPanel);
+        rightPanel = new JPanel(new BorderLayout());
+        centralPanel.add(rightPanel);
+        
+        createLeftPanel();
+        createRightPanel();
         
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);                                           //sets the size of the JFrame to the constants WINDOW_WIDTH and WINDOW_HEIGHT
         setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));                     //sets the minimum size of the JFrame to the same constants
     }
     
+    private void createLeftPanel()
+    {
+        createDateLabel();                                                              //run createLabel method
+        createTextArea();                                                               //run createTextArea method
+        createControlPanel();                                                           //run createControlPanel method
+        createMenuBar();                                                                //run createMenuBar method
+    }
+    
+    private void createRightPanel()
+    {
+        createMonthLabel();
+        createCalendar();
+        createContactDescriptionPanel();
+    }
+    
     /**
      * method to create JLabel for frame
      */
-    private void createLabel()
+    private void createDateLabel()
     {
         dateLabel = new JLabel(sdf.format(date.getTime()));                             //initializes the dateLabel variable to point to a new JLabel object which displays the current date
-        add(dateLabel, BorderLayout.NORTH);                                             //add the label object to the north part of the JFrame
+        leftPanel.add(dateLabel, BorderLayout.NORTH);                                             //add the label object to the north part of the JFrame
     }
-    
     
     /**
      * method to create main text area
@@ -126,7 +181,7 @@ public class AppointmentFrame extends JFrame
         textArea = new JTextArea();                                                     //initialize the textArea as a pointer to a new JTextArea object
         textArea.setEditable(false);                                                    //disable editing the text in the JTextArea
         scrollPane = new JScrollPane(textArea);                                         //create a new JScrollPane fromm the JTextArea to make it scrollable
-        add(scrollPane, BorderLayout.CENTER);                                           //add the scrollPane to the center of the JFrame
+        leftPanel.add(scrollPane, BorderLayout.CENTER);                                           //add the scrollPane to the center of the JFrame
     }
     
     
@@ -137,10 +192,9 @@ public class AppointmentFrame extends JFrame
     {
         controlPanel = new JPanel(new BorderLayout());                                  //create a new panel for the control panel
         createDateSubpanel();                                                           //call the createDateSubpanel method
-        createActionSubpanel();                                                         //call the createActionSubpanel method
-        createDescriptionSubpanel();                                                    //call the createDescriptionSubPanel method
+        createAppointmentSubpanel();                                                         //call the createActionSubpanel method
         
-        add(controlPanel, BorderLayout.SOUTH);                                          //add the controlPanel to the south of the JFrame
+        leftPanel.add(controlPanel, BorderLayout.SOUTH);                                          //add the controlPanel to the south of the JFrame
     }
     
     
@@ -161,18 +215,18 @@ public class AppointmentFrame extends JFrame
         
         subDatePanelB = new JPanel();                                                   //create another subpanel with the flow layout to store the inputs and labels
         
-        dayLabel = new JLabel("Day");                                                   //initialize the dayLabel as a pointer to a new JLabel object with label Day
-        subDatePanelB.add(dayLabel);                                                    //add the label to the subpanel
+        dayInputLabel = new JLabel("Day");                                                   //initialize the dayLabel as a pointer to a new JLabel object with label Day
+        subDatePanelB.add(dayInputLabel);                                                    //add the label to the subpanel
         dayInput = new JTextField(Integer.toString(date.get(Calendar.DAY_OF_MONTH)), 2);//initialize the dayInput as a pointer to a new JTextField with default text of the current day and a size of 2 columns
         subDatePanelB.add(dayInput);                                                    //add the dayinput to the subpanel
         
-        monthLabel = new JLabel("Month");                                               //initialize the monthLabel as a pointer to a new JLabel object with label Month
-        subDatePanelB.add(monthLabel);                                                  //add the label to the subpanel
+        monthInputLabel = new JLabel("Month");                                               //initialize the monthInputLabel as a pointer to a new JLabel object with label Month
+        subDatePanelB.add(monthInputLabel);                                                  //add the label to the subpanel
         monthInput = new JTextField(Integer.toString(date.get(Calendar.MONTH)+1), 2);   //initialize the monthInput as a pointer to a new JTextField with default text of the current month and a size of 2 columns
         subDatePanelB.add(monthInput);                                                  //add the monthInput to the subpanel
         
-        yearLabel = new JLabel("Year");                                                 //initialize the monthLabel as a pointer to a new JLabel object with label Year
-        subDatePanelB.add(yearLabel);                                                   //add the label to the subpanel
+        yearInputLabel = new JLabel("Year");                                                 //initialize the yearLabel as a pointer to a new JLabel object with label Year
+        subDatePanelB.add(yearInputLabel);                                                   //add the label to the subpanel
         yearInput = new JTextField(Integer.toString(date.get(Calendar.YEAR)), 4);       //initialize the yearInput as a pointer to a new JTextField with default text of the current year and a size of 4 columns
         subDatePanelB.add(yearInput);                                                   //add the yearInput to the subpanel
         datePanel.add(subDatePanelB, BorderLayout.CENTER);                              //add the subpanel to the datePanel
@@ -285,35 +339,34 @@ public class AppointmentFrame extends JFrame
         }
     }
  
-    
-    
     /**
      * create the subpanel for the actions
      */
-    private void createActionSubpanel()
+    private void createAppointmentSubpanel()
     {
-        actionBorder = new TitledBorder("Action");                                      //create a new TitledBorder with title Action
-        actionBorder.setTitleJustification(TitledBorder.LEFT);                          //set the justification for the title to left
-        actionPanel = new JPanel(new BorderLayout());                                   //create a new JPanel
-        actionPanel.setBorder(actionBorder);                                            //set the border of the new JPanel to the new border
+        appointmentBorder = new TitledBorder("Appointment");                                      //create a new TitledBorder with title Action
+        appointmentBorder.setTitleJustification(TitledBorder.LEFT);                          //set the justification for the title to left
+        appointmentPanel = new JPanel(new BorderLayout());                                   //create a new JPanel
+        appointmentPanel.setBorder(appointmentBorder);                                            //set the border of the new JPanel to the new border
         
-        subActionPanelA = new JPanel();                                                 //create a subpanel
+        subAppointmentPanelA = new JPanel();                                                 //create a subpanel
         hourLabel = new JLabel("Hour");                                                 //set the hourLabel to point to a new JLabel object with label Hour
-        subActionPanelA.add(hourLabel);                                                 //add the hourLabel to the subpanel
+        subAppointmentPanelA.add(hourLabel);                                                 //add the hourLabel to the subpanel
         hourInput = new JTextField(2);                                                  //create a new JTextField object with 2 columns
-        subActionPanelA.add(hourInput);                                                 //add the hourInput to the subpanel
+        subAppointmentPanelA.add(hourInput);                                                 //add the hourInput to the subpanel
         minuteLabel = new JLabel("Minute");                                             //repeat this for minutes
-        subActionPanelA.add(minuteLabel);
+        subAppointmentPanelA.add(minuteLabel);
         minuteInput = new JTextField(2);
-        subActionPanelA.add(minuteInput);
-        actionPanel.add(subActionPanelA, BorderLayout.NORTH);                           //add the subpanel to the north of the main actionPanel
+        subAppointmentPanelA.add(minuteInput);
+        appointmentPanel.add(subAppointmentPanelA, BorderLayout.NORTH);                           //add the subpanel to the north of the main actionPanel
         
-        subActionPanelB = new JPanel();                                                 //make another subpanel
+        subAppointmentPanelB = new JPanel();                                                 //make another subpanel
         createCreateButton();                                                           //run the createCreateButton method
         createCancelButton();                                                           //run the createCancelButton method
-        actionPanel.add(subActionPanelB, BorderLayout.CENTER);                          //add the subpanel to the main actionPanel
+        createRecallButton();
+        appointmentPanel.add(subAppointmentPanelB, BorderLayout.CENTER);                          //add the subpanel to the main actionPanel
         
-        controlPanel.add(actionPanel, BorderLayout.CENTER);                             //add the actionPanel to the controlPanel
+        controlPanel.add(appointmentPanel, BorderLayout.CENTER);                             //add the actionPanel to the controlPanel
     }
     
     /**
@@ -365,7 +418,7 @@ public class AppointmentFrame extends JFrame
             }
         }
         createButton.addActionListener(new CreateButtonListener());                     //add the new ActionListener to the JButton
-        subActionPanelB.add(createButton);                                              //add the createbutton to the second action subpanel
+        subAppointmentPanelB.add(createButton);                                              //add the createbutton to the second action subpanel
     }
 
     /**
@@ -406,23 +459,21 @@ public class AppointmentFrame extends JFrame
             }
         }
         cancelButton.addActionListener(new CancelButtonListener());                     //add the ActionListener to the cancelButton
-        subActionPanelB.add(cancelButton);                                              //add the cancelButton to the second action subpanel
+        subAppointmentPanelB.add(cancelButton);                                              //add the cancelButton to the second action subpanel
     }
     
-    
-    /**
-     * creates the description subpanel
-     */
-    private void createDescriptionSubpanel()
+    private void createRecallButton()
     {
-        descriptionBorder = new TitledBorder("Description");                            //create a new TitledBorder with title Description
-        descriptionBorder.setTitleJustification(TitledBorder.LEFT);                     //set the justification for the title to left
-        descriptionPanel = new JPanel(new BorderLayout());                              //create a new JPanel with the BorderLayout
-        descriptionPanel.setBorder(descriptionBorder);                                  //set the border for the panel to the TitledBorder
-        
-        description = new JTextArea(4, 10);                                             //create a new JTextArea with 4 rows and 10 columns
-        descriptionPanel.add(description, BorderLayout.CENTER);                         //add the description JTextArea to the center of the descriptionPanel
-        controlPanel.add(descriptionPanel, BorderLayout.SOUTH);                         //add the descriptionPanel to the south of the controlPanel
+        recallButton = new JButton("Recall");
+        class RecallButtonListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent evt)
+            {
+                
+            }
+        }
+        recallButton.addActionListener(new RecallButtonListener());
+        subAppointmentPanelB.add(recallButton);
     }
     
     /**
@@ -517,4 +568,133 @@ public class AppointmentFrame extends JFrame
         addSampleAppointments.addActionListener(new AddSampleListener());                   //add the ActionListener to the menu item
         manageMenu.add(addSampleAppointments);                                              //add the menu item to the manage menu
     }
+
+    private void createMonthLabel()
+    {
+        SimpleDateFormat sdfMonth = new SimpleDateFormat("MMM");
+        monthLabel = new JLabel(sdfMonth.format(date.getTime()));
+        rightPanel.add(monthLabel, BorderLayout.NORTH);
+    }
+    
+    private void createCalendar()
+    {
+        calendarPanel = new JPanel();//new BorderLayout());
+        
+        calendarSubPanelA = new JPanel(new GridLayout(1, 7));
+        for(int i = 0; i < 7; i++)
+        {
+            calendarSubPanelA.add(new JLabel(Integer.toString(i)));
+        }
+        calendarPanel.add(calendarSubPanelA);//, BorderLayout.NORTH);
+        
+        calendarSubPanelB = new JPanel(new GridLayout(5, 7));
+        int currentYear = date.get(Calendar.YEAR);
+        int currentMonth = date.get(Calendar.MONTH);
+        int previousMonth = currentMonth - 1;
+        int nextMonth = currentMonth + 1;
+        int numberOfDays = date.getActualMaximum(Calendar.DAY_OF_MONTH);
+        //ArrayList<JButton> calendarButtons = new ArrayList<JButton>;
+        for(int i = 1; i <= numberOfDays; i++)
+        {
+            calendarSubPanelB.add(new JButton(Integer.toString(i)));
+            //calendarButtons.add(new JButton(i));
+            //System.out.println(i);
+        }
+        calendarPanel.add(calendarSubPanelB);//, BorderLayout.SOUTH);
+        rightPanel.add(calendarPanel);
+    }
+    
+    private void createContactDescriptionPanel()
+    {
+        contactDescriptionPanel = new JPanel(new BorderLayout());
+        createContactPanel();
+        createDescriptionPanel();
+        rightPanel.add(contactDescriptionPanel, BorderLayout.SOUTH);
+    }
+    
+    private void createContactPanel()
+    {
+        contactBorder = new TitledBorder("Contact");
+        contactBorder.setTitleJustification(TitledBorder.LEFT);
+        contactPanel = new JPanel(new BorderLayout());
+        contactPanel.setBorder(contactBorder);
+        
+        contactSubPanelA = new JPanel(new GridLayout(4, 2));
+        lastNameLabel = new JLabel("Last Name");
+        firstNameLabel = new JLabel("First Name");
+        contactSubPanelA.add(lastNameLabel);
+        contactSubPanelA.add(firstNameLabel);
+        lastNameInput = new JTextField();
+        firstNameInput = new JTextField();
+        contactSubPanelA.add(lastNameInput);
+        contactSubPanelA.add(firstNameInput);
+        telephoneLabel = new JLabel("Telephone");
+        emailLabel = new JLabel("email");
+        contactSubPanelA.add(telephoneLabel);
+        contactSubPanelA.add(emailLabel);
+        telephoneInput = new JTextField();
+        emailInput = new JTextField();
+        contactSubPanelA.add(telephoneInput);
+        contactSubPanelA.add(emailInput);
+        
+        contactSubPanelB = new JPanel(new BorderLayout());
+        addressLabel = new JLabel("Address");
+        contactSubPanelB.add(addressLabel, BorderLayout.NORTH);
+        addressInput = new JTextField();
+        contactSubPanelB.add(addressInput);
+        
+        contactSubPanelC = new JPanel();
+        createFindButton();
+        createClearButton();
+        
+        contactPanel.add(contactSubPanelA, BorderLayout.NORTH);
+        contactPanel.add(contactSubPanelB, BorderLayout.CENTER);
+        contactPanel.add(contactSubPanelC, BorderLayout.SOUTH);
+        
+        contactDescriptionPanel.add(contactPanel, BorderLayout.NORTH);
+    }
+    
+    private void createFindButton()
+    {
+        findButton = new JButton("Find");
+        class FindButtonListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                System.out.println("Find button was pressed, replace later");
+            }
+        }
+        findButton.addActionListener(new FindButtonListener());
+        contactSubPanelC.add(findButton);
+    }
+    
+    private void createClearButton()
+    {
+        clearButton = new JButton("Clear");
+        class ClearButtonListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                System.out.println("Clear button was pressed, replace later");
+            }
+        }
+        clearButton.addActionListener(new ClearButtonListener());
+        contactSubPanelC.add(clearButton);
+    }
+    
+    /**
+     * creates the description subpanel
+     */
+    private void createDescriptionPanel()
+    {
+        descriptionBorder = new TitledBorder("Description");                            //create a new TitledBorder with title Description
+        descriptionBorder.setTitleJustification(TitledBorder.LEFT);                     //set the justification for the title to left
+        descriptionPanel = new JPanel(new BorderLayout());                              //create a new JPanel with the BorderLayout
+        descriptionPanel.setBorder(descriptionBorder);                                  //set the border for the panel to the TitledBorder
+        
+        description = new JTextArea(6, 10);                                             //create a new JTextArea with 4 rows and 10 columns
+        descriptionPanel.add(description, BorderLayout.CENTER);                         //add the description JTextArea to the center of the descriptionPanel
+        contactDescriptionPanel.add(descriptionPanel, BorderLayout.SOUTH);                         //add the descriptionPanel to the south of the controlPanel
+    }
+    
 }
