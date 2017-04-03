@@ -301,20 +301,35 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent evt)                                //override the actionPerformed method
             {                
-                String year = yearInput.getText();                                      //get the provided year from the textField
+                /*String year = yearInput.getText();                                      //get the provided year from the textField
                 if(!year.equals(""))                                                    //if the provided year isnt blank
                 {
                     date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the current year to the one provided
                 }
                 String month = monthInput.getText();                                    //repeat the same steps for month and day
-                if(!month.equals(""))
+                if(!month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13)
                 {
                     date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
                 }
                 String day = dayInput.getText();
-                if(!day.equals(""))
+                if(!day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
                 {
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                }*/
+                String year = yearInput.getText();
+                String month = monthInput.getText();
+                String day = dayInput.getText();
+                if(!year.equals("") && 
+                    !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
+                    !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
+                {
+                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));
+                    date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
+                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                }
+                else
+                {
+                    System.out.println("Invalid date entered");
                 }
                 yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
                 monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
