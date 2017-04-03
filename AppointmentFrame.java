@@ -301,35 +301,20 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent evt)                                //override the actionPerformed method
             {                
-                /*String year = yearInput.getText();                                      //get the provided year from the textField
-                if(!year.equals(""))                                                    //if the provided year isnt blank
-                {
-                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the current year to the one provided
-                }
-                String month = monthInput.getText();                                    //repeat the same steps for month and day
-                if(!month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13)
-                {
-                    date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
-                }
-                String day = dayInput.getText();
-                if(!day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
-                {
-                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
-                }*/
-                String year = yearInput.getText();
+                String year = yearInput.getText();                                      //get input from JTextFields
                 String month = monthInput.getText();
                 String day = dayInput.getText();
-                if(!year.equals("") && 
+                if(!year.equals("") &&                                                  //check if the date is a valid value
                     !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
                     !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
                 {
-                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));
+                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
                     date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
                 }
                 else
                 {
-                    System.out.println("Invalid date entered");
+                    System.out.println("Invalid date entered");                         //print a message
                 }
                 yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
                 monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
@@ -371,29 +356,29 @@ public class AppointmentFrame extends JFrame
      */
     private void createAppointmentSubpanel()
     {
-        appointmentBorder = new TitledBorder("Appointment");                                      //create a new TitledBorder with title Action
-        appointmentBorder.setTitleJustification(TitledBorder.LEFT);                          //set the justification for the title to left
-        appointmentPanel = new JPanel(new BorderLayout());                                   //create a new JPanel
-        appointmentPanel.setBorder(appointmentBorder);                                            //set the border of the new JPanel to the new border
+        appointmentBorder = new TitledBorder("Appointment");                            //create a new TitledBorder with title Action
+        appointmentBorder.setTitleJustification(TitledBorder.LEFT);                     //set the justification for the title to left
+        appointmentPanel = new JPanel(new BorderLayout());                              //create a new JPanel
+        appointmentPanel.setBorder(appointmentBorder);                                  //set the border of the new JPanel to the new border
         
-        subAppointmentPanelA = new JPanel();                                                 //create a subpanel
+        subAppointmentPanelA = new JPanel();                                            //create a subpanel
         hourLabel = new JLabel("Hour");                                                 //set the hourLabel to point to a new JLabel object with label Hour
-        subAppointmentPanelA.add(hourLabel);                                                 //add the hourLabel to the subpanel
+        subAppointmentPanelA.add(hourLabel);                                            //add the hourLabel to the subpanel
         hourInput = new JTextField(2);                                                  //create a new JTextField object with 2 columns
-        subAppointmentPanelA.add(hourInput);                                                 //add the hourInput to the subpanel
+        subAppointmentPanelA.add(hourInput);                                            //add the hourInput to the subpanel
         minuteLabel = new JLabel("Minute");                                             //repeat this for minutes
         subAppointmentPanelA.add(minuteLabel);
         minuteInput = new JTextField(2);
         subAppointmentPanelA.add(minuteInput);
-        appointmentPanel.add(subAppointmentPanelA, BorderLayout.NORTH);                           //add the subpanel to the north of the main actionPanel
+        appointmentPanel.add(subAppointmentPanelA, BorderLayout.NORTH);                 //add the subpanel to the north of the main actionPanel
         
-        subAppointmentPanelB = new JPanel();                                                 //make another subpanel
+        subAppointmentPanelB = new JPanel();                                            //make another subpanel
         createCreateButton();                                                           //run the createCreateButton method
         createCancelButton();                                                           //run the createCancelButton method
         createRecallButton();
-        appointmentPanel.add(subAppointmentPanelB, BorderLayout.CENTER);                          //add the subpanel to the main actionPanel
+        appointmentPanel.add(subAppointmentPanelB, BorderLayout.CENTER);                //add the subpanel to the main actionPanel
         
-        controlPanel.add(appointmentPanel, BorderLayout.CENTER);                             //add the actionPanel to the controlPanel
+        controlPanel.add(appointmentPanel, BorderLayout.CENTER);                        //add the actionPanel to the controlPanel
     }
     
     /**
@@ -446,7 +431,7 @@ public class AppointmentFrame extends JFrame
             }
         }
         createButton.addActionListener(new CreateButtonListener());                     //add the new ActionListener to the JButton
-        subAppointmentPanelB.add(createButton);                                              //add the createbutton to the second action subpanel
+        subAppointmentPanelB.add(createButton);                                         //add the createbutton to the second action subpanel
     }
 
     /**
