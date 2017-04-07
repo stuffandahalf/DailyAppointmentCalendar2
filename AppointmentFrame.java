@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
+import java.lang.Math;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -259,6 +260,8 @@ public class AppointmentFrame extends JFrame
                 date.add(Calendar.DAY_OF_MONTH, -1);                                    //add -1 days to the current date
                 monthLabel.setText(sdfMonth.format(date.getTime()));
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
+                calendarPanel.removeAll();
+                createCalendar();
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
         }
@@ -281,6 +284,8 @@ public class AppointmentFrame extends JFrame
                 date.add(Calendar.DAY_OF_MONTH, 1);                                     //add 1 day to the current date
                 monthLabel.setText(sdfMonth.format(date.getTime()));
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
+                calendarPanel.removeAll();
+                createCalendar();
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
         }
@@ -645,16 +650,52 @@ public class AppointmentFrame extends JFrame
         }
         calendarPanel.add(calendarSubPanelA, BorderLayout.NORTH);
         
-        calendarSubPanelB = new JPanel(new GridLayout(5, 7));
+        int counter = 0;
+        
+        calendarSubPanelB = new JPanel(new GridLayout(6, 7));
         int currentYear = date.get(Calendar.YEAR);
         int currentMonth = date.get(Calendar.MONTH);
         int previousMonth = currentMonth - 1;
         int nextMonth = currentMonth + 1;
-        int currentDay = date.get(Calendar.DAY_OF_WEEK);
-        int numberOfDays = date.getActualMaximum(Calendar.DAY_OF_MONTH);
-        //Calendar currentMonthCalendar = new GregorianCalendar(
-        //for(int i = 1; i <= numberOfDays; i++)
-        for(int i = 1; i <= 35; i++)
+        int currentDay = date.get(Calendar.DAY_OF_MONTH);
+        Calendar currentMonthCalendar = new GregorianCalendar(currentYear, currentMonth, 1);
+        int remainingDays = currentMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+        int numberOfDays = currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        Calendar previousMonthCalendar = new GregorianCalendar(currentYear, previousMonth, 1);
+        previousMonthCalendar.set(Calendar.DAY_OF_MONTH, previousMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Calendar nextMonthCalendar = new GregorianCalendar(currentYear, nextMonth, 1);
+        currentMonthCalendar.set(Calendar.DAY_OF_MONTH, currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        int leftoverDays = 7 - currentMonthCalendar.get(Calendar.DAY_OF_WEEK);
+        while(remainingDays > 0)
+        {
+            int i = previousMonthCalendar.get(Calendar.DAY_OF_MONTH) - remainingDays + 1;
+            JButton calendarButton = new JButton(Integer.toString(i));
+            calendarButton.setBackground(Color.GRAY);
+            class CalendarButtonListener implements ActionListener
+            {
+                private int index;
+                public CalendarButtonListener(int i)
+                {
+                    this.index = i;
+                }
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("Button " + index + " was pressed, replace later");
+                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)-1);
+                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
+                    monthLabel.setText(sdfMonth.format(date.getTime()));
+                    dateLabel.setText(sdf.format(date.getTime()));
+                    calendarPanel.removeAll();
+                    createCalendar();
+                    calendarPanel.revalidate();
+                }
+            }
+            calendarButton.addActionListener(new CalendarButtonListener(i));
+            calendarSubPanelB.add(calendarButton);
+            remainingDays--;
+            counter++;
+        }
+        for(int i = 1; i <= numberOfDays; i++)
         {
             JButton calendarButton = new JButton(Integer.toString(i));
             if(currentDay == Integer.parseInt(calendarButton.getText()))
@@ -672,11 +713,81 @@ public class AppointmentFrame extends JFrame
                 public void actionPerformed(ActionEvent e)
                 {
                     System.out.println("Button " + index + " was pressed, replace later");
+                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
+                    monthLabel.setText(sdfMonth.format(date.getTime()));
+                    dateLabel.setText(sdf.format(date.getTime()));
+                    calendarPanel.removeAll();
+                    createCalendar();
+                    calendarPanel.revalidate();
                 }
             }
             calendarButton.addActionListener(new CalendarButtonListener(i));
             calendarSubPanelB.add(calendarButton);
+            counter++;
         }
+        while(leftoverDays > 0)
+        {
+            int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);
+            JButton calendarButton = new JButton(Integer.toString(i));
+            nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);
+            calendarButton.setBackground(Color.GRAY);
+            class CalendarActionListener implements ActionListener
+            {
+                private int index;
+                public CalendarActionListener(int i)
+                {
+                    this.index = i;
+                }
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("Button " + index + " was pressed, replace later");
+                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
+                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
+                    monthLabel.setText(sdfMonth.format(date.getTime()));
+                    dateLabel.setText(sdf.format(date.getTime()));
+                    calendarPanel.removeAll();
+                    createCalendar();
+                    calendarPanel.revalidate();
+                }
+            }
+            calendarButton.addActionListener(new CalendarActionListener(i));
+            calendarSubPanelB.add(calendarButton);
+            leftoverDays--;
+            counter++;
+        }
+        if(counter % 6 != 0)
+        {
+            for(int j = 0; j < 7; j++)
+            {
+                int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);
+                JButton calendarButton = new JButton(Integer.toString(i));
+                nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);
+                calendarButton.setBackground(Color.GRAY);
+                class CalendarActionListener implements ActionListener
+                {
+                    private int index;
+                    public CalendarActionListener(int i)
+                    {
+                        this.index = i;
+                    }
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        System.out.println("Button " + index + " was pressed, replace later");
+                        date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
+                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
+                        monthLabel.setText(sdfMonth.format(date.getTime()));
+                        dateLabel.setText(sdf.format(date.getTime()));
+                        calendarPanel.removeAll();
+                        createCalendar();
+                        calendarPanel.revalidate();
+                    }
+                }
+                calendarButton.addActionListener(new CalendarActionListener(i));
+                calendarSubPanelB.add(calendarButton);
+                leftoverDays--;
+            }
+        }
+        
         calendarPanel.add(calendarSubPanelB, BorderLayout.CENTER);
         rightPanel.add(calendarPanel);
     }
