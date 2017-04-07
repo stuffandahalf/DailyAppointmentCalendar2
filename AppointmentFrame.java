@@ -159,6 +159,9 @@ public class AppointmentFrame extends JFrame
         setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));                     //sets the minimum size of the JFrame to the same constants
     }
     
+    /**
+     * create the left panel
+     */
     private void createLeftPanel()
     {
         createDateLabel();                                                              //run createLabel method
@@ -167,6 +170,9 @@ public class AppointmentFrame extends JFrame
         createMenuBar();                                                                //run createMenuBar method
     }
     
+    /**
+     * create the right panel
+     */
     private void createRightPanel()
     {
         createMonthLabel();
@@ -488,6 +494,9 @@ public class AppointmentFrame extends JFrame
         subAppointmentPanelB.add(cancelButton);                                              //add the cancelButton to the second action subpanel
     }
     
+    /**
+     * create the recall button
+     */
     private void createRecallButton()
     {
         recallButton = new JButton("Recall");
@@ -626,12 +635,18 @@ public class AppointmentFrame extends JFrame
         manageMenu.add(addSampleAppointments);                                              //add the menu item to the manage menu
     }
 
+    /**
+     * create the label with the current month
+     */
     private void createMonthLabel()
     {
         monthLabel = new JLabel(sdfMonth.format(date.getTime()));
         rightPanel.add(monthLabel, BorderLayout.NORTH);
     }
     
+    /**
+     * create the calendar buttons
+     */
     private void createCalendar()
     {
         calendarPanel = new JPanel(new BorderLayout());
@@ -792,6 +807,9 @@ public class AppointmentFrame extends JFrame
         rightPanel.add(calendarPanel);
     }
     
+    /**
+     * create the panel that holds the contacts and the description
+     */
     private void createContactDescriptionPanel()
     {
         contactDescriptionPanel = new JPanel(new BorderLayout());
@@ -800,6 +818,9 @@ public class AppointmentFrame extends JFrame
         rightPanel.add(contactDescriptionPanel, BorderLayout.SOUTH);
     }
     
+    /**
+     * create the contact panel
+     */
     private void createContactPanel()
     {
         contactBorder = new TitledBorder("Contact");
@@ -842,6 +863,9 @@ public class AppointmentFrame extends JFrame
         contactDescriptionPanel.add(contactPanel, BorderLayout.NORTH);
     }
     
+    /**
+     * create the find button
+     */
     private void createFindButton()
     {
         findButton = new JButton("Find");
@@ -856,6 +880,9 @@ public class AppointmentFrame extends JFrame
         contactSubPanelC.add(findButton);
     }
     
+    /**
+     * create the clear button
+     */
     private void createClearButton()
     {
         clearButton = new JButton("Clear");
