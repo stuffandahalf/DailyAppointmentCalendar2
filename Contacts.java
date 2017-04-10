@@ -11,9 +11,10 @@ public class Contacts
 {
     private LinkedList<Person> people;
     
-    public Contacts()
+    public Contacts() throws IOException, InputMismatchException
     {
         people = new LinkedList<Person>();
+        readContactsFile();
     }
     
     public Person findPersonByEmail(String email)
@@ -27,39 +28,19 @@ public class Contacts
         }
         return null;
     }
-    
-    public Person findPersonByFirstName(String firstName)
+        
+    public Person findPersonByName(String firstName, String lastName)
     {
-        for(Person i : people)
-        {
-            if(i.getFirstName().equals(firstName))
-            {
-                return i;
-            }
-        }
-        return null;
-    }
-    
-    public Person findPersonByLastName(String lastName)
-    {
-        for(Person i : people)
-        {
-            if(i.getLastName().equals(lastName))
-            {
-                return i;
-            }
-        }
-        return null;
-    }
-    
-    /*public Person findPersonByName(String firstName, String lastName)
-    {
+        Person tmp = new Person(lastName, firstName, "", "", "");
         for(Person contact : people)
         {
-            if(contact.compareTo(
+            if(contact.compareTo(tmp) == 0)
+	    {
+                return contact;
+            }
         }
         return null;
-    }*/
+    }
     
     public Person findPersonByTelephone(String telephone)
     {
@@ -106,6 +87,8 @@ public class Contacts
         }
         contactFile.close();
         Collections.sort(people);
+        //count = Integer.parseInt(contactFile.next());
+        //System.out.println(count);
     }
     
     private void testInput(String input, LinkedList<Person> list) throws InputMismatchException

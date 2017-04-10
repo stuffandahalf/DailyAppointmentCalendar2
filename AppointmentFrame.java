@@ -17,9 +17,11 @@ import java.util.Stack;
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.InputMismatchException;
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.lang.Math;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,6 +50,7 @@ public class AppointmentFrame extends JFrame
     private SimpleDateFormat sdfMonth;
     private ArrayList<Appointment> appointments;
     private Stack<Appointment> appointmentsStack;
+    private Contacts contacts;
     
     //gui instance variables
     private JPanel centralPanel;
@@ -143,7 +146,18 @@ public class AppointmentFrame extends JFrame
         sdfMonth = new SimpleDateFormat("MMM");
         appointments = new ArrayList<Appointment>();                                    //initialize appointments as a pointer to a new ArrayList for storing Appointment objects
         appointmentsStack = new Stack<Appointment>();                                   //initialize appointmentsStack as a pointer to a new stack to store Appointment objects as they are added
-        
+        try
+        {
+            contacts = new Contacts();
+        }
+        catch(IOException e)
+        {
+            System.out.println(e);
+        }
+        catch(InputMismatchException e)
+        {
+            System.out.println(e);
+        }
         centralPanel = new JPanel(new GridLayout(1, 2));
         add(centralPanel);
         
@@ -322,10 +336,13 @@ public class AppointmentFrame extends JFrame
                     date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
                     date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                    calendarPanel.removeAll();
+                    createCalendar();
                 }
                 else
                 {
-                    System.out.println("Invalid date entered");                         //print a message
+                    //System.out.println("Invalid date entered");                         //print a message
+                    description.setText("ERROR: INVALID DATE ENTERED");
                 }
                 yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
                 monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
@@ -409,13 +426,13 @@ public class AppointmentFrame extends JFrame
                 
                 String hour = hourInput.getText();                                      //get the hour from the hourInput JTextField
                 String minute = minuteInput.getText();                                  //get the minute from the minuteInput JTextField
-                if(hour.equals(""))                                                     //if the given hours are blank
+                if(hour.equals("") || Integer.parseInt(hour) < 0 || Integer.parseInt(hour) > 23)	//if the given hours are blank or invalid
                 {
                     description.setText("ERROR");                                       //set the description box to say ERROR
                 }
                 else                                                                    //otherwise
                 {
-                    if(minute.equals(""))                                               //if the given minutes are blank
+                    if(minute.equals("") && !(Integer.parseInt(minute) < 0 || Integer.parseInt(minute) > 59))                                               //if the given minutes are blank
                     {
                         minute = "0";                                                   //set minutes to 0
                     }
@@ -529,11 +546,12 @@ public class AppointmentFrame extends JFrame
                 }
                 else
                 {
-                    dayInput.setText("");
+                    /*dayInput.setText("");
                     monthInput.setText("");
                     yearInput.setText("");
                     hourInput.setText("");
-                    minuteInput.setText("");
+                    minuteInput.setText("");*/
+		    description.setText("ERROR: NO APPOINTMENTS TO RECALL");
                 }
             }
         }
@@ -688,14 +706,8 @@ public class AppointmentFrame extends JFrame
             calendarButton.setBackground(Color.GRAY);
             class CalendarButtonListener implements ActionListener
             {
-                private int index;
-                public CalendarButtonListener(int i)
-                {
-                    this.index = i;
-                }
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("Button " + index + " was pressed, replace later");
                     date.set(Calendar.MONTH, date.get(Calendar.MONTH)-1);
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
                     monthLabel.setText(sdfMonth.format(date.getTime()));
@@ -705,7 +717,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.revalidate();
                 }
             }
-            calendarButton.addActionListener(new CalendarButtonListener(i));
+            calendarButton.addActionListener(new CalendarButtonListener());
             calendarSubPanelB.add(calendarButton);
             remainingDays--;
             counter++;
@@ -719,15 +731,8 @@ public class AppointmentFrame extends JFrame
             }
             class CalendarButtonListener implements ActionListener
             {
-                private int index;
-                public CalendarButtonListener(int i)
-                {
-                    this.index = i;
-                }
-                
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("Button " + index + " was pressed, replace later");
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
                     monthLabel.setText(sdfMonth.format(date.getTime()));
                     dateLabel.setText(sdf.format(date.getTime()));
@@ -736,7 +741,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.revalidate();
                 }
             }
-            calendarButton.addActionListener(new CalendarButtonListener(i));
+            calendarButton.addActionListener(new CalendarButtonListener());
             calendarSubPanelB.add(calendarButton);
             counter++;
         }
@@ -748,14 +753,8 @@ public class AppointmentFrame extends JFrame
             calendarButton.setBackground(Color.GRAY);
             class CalendarActionListener implements ActionListener
             {
-                private int index;
-                public CalendarActionListener(int i)
-                {
-                    this.index = i;
-                }
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("Button " + index + " was pressed, replace later");
                     date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
                     monthLabel.setText(sdfMonth.format(date.getTime()));
@@ -765,7 +764,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.revalidate();
                 }
             }
-            calendarButton.addActionListener(new CalendarActionListener(i));
+            calendarButton.addActionListener(new CalendarActionListener());
             calendarSubPanelB.add(calendarButton);
             leftoverDays--;
             counter++;
@@ -780,14 +779,8 @@ public class AppointmentFrame extends JFrame
                 calendarButton.setBackground(Color.GRAY);
                 class CalendarActionListener implements ActionListener
                 {
-                    private int index;
-                    public CalendarActionListener(int i)
-                    {
-                        this.index = i;
-                    }
                     public void actionPerformed(ActionEvent e)
                     {
-                        System.out.println("Button " + index + " was pressed, replace later");
                         date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
                         date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
                         monthLabel.setText(sdfMonth.format(date.getTime()));
@@ -797,7 +790,7 @@ public class AppointmentFrame extends JFrame
                         calendarPanel.revalidate();
                     }
                 }
-                calendarButton.addActionListener(new CalendarActionListener(i));
+                calendarButton.addActionListener(new CalendarActionListener());
                 calendarSubPanelB.add(calendarButton);
                 leftoverDays--;
             }
@@ -850,6 +843,7 @@ public class AppointmentFrame extends JFrame
         addressLabel = new JLabel("Address");
         contactSubPanelB.add(addressLabel, BorderLayout.NORTH);
         addressInput = new JTextField();
+        addressInput.setEditable(false);
         contactSubPanelB.add(addressInput);
         
         contactSubPanelC = new JPanel();
@@ -873,7 +867,57 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                System.out.println("Find button was pressed, replace later");
+                if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
+                {
+                    try
+                    {
+                        Person tmp = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());
+                        setFields(tmp);
+                    }
+                    catch(NullPointerException err)
+                    {
+			System.out.println("1");
+                        description.setText("ERROR: CONTACT NOT FOUND");
+                    }
+                }
+                else if(!emailInput.getText().equals(""))
+                {
+                    try
+                    {
+                        Person tmp = contacts.findPersonByEmail(emailInput.getText());
+                        setFields(tmp);
+                    }
+                    catch(NullPointerException err)
+                    {
+                        System.out.println("2");
+                        description.setText("ERROR: CONTACT NOT FOUND");
+                    }
+                }
+                else if(!telephoneInput.getText().equals(""))
+                {
+                    try
+                    {
+                        Person tmp = contacts.findPersonByTelephone(telephoneInput.getText());
+                        setFields(tmp);
+                    }
+                    catch(NullPointerException err)
+                    {
+                        System.out.println("3");
+                        description.setText("ERROR: CONTACT NOT FOUND");
+                    }
+                }
+                else
+                {
+                    description.setText("ERROR: NO FIELDS WERE FILLED");
+                }
+            }
+            private void setFields(Person tmp)
+            {
+                firstNameInput.setText(tmp.getFirstName());
+                lastNameInput.setText(tmp.getLastName());
+                addressInput.setText(tmp.getAddress());
+                telephoneInput.setText(tmp.getTelephone());
+                emailInput.setText(tmp.getEmail());
             }
         }
         findButton.addActionListener(new FindButtonListener());
@@ -890,7 +934,11 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                System.out.println("Clear button was pressed, replace later");
+                lastNameInput.setText("");
+                firstNameInput.setText("");
+                telephoneInput.setText("");
+                emailInput.setText("");
+                addressInput.setText("");
             }
         }
         clearButton.addActionListener(new ClearButtonListener());
