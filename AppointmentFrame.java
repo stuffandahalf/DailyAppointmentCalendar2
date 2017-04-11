@@ -867,48 +867,31 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
-                if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
+                try
                 {
-                    try
+                    if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
                     {
                         Person tmp = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());
                         setFields(tmp);
                     }
-                    catch(NullPointerException err)
-                    {
-			System.out.println("1");
-                        description.setText("ERROR: CONTACT NOT FOUND");
-                    }
-                }
-                else if(!emailInput.getText().equals(""))
-                {
-                    try
+                    else if(!emailInput.getText().equals(""))
                     {
                         Person tmp = contacts.findPersonByEmail(emailInput.getText());
                         setFields(tmp);
                     }
-                    catch(NullPointerException err)
-                    {
-                        System.out.println("2");
-                        description.setText("ERROR: CONTACT NOT FOUND");
-                    }
-                }
-                else if(!telephoneInput.getText().equals(""))
-                {
-                    try
+                    else if(!telephoneInput.getText().equals(""))
                     {
                         Person tmp = contacts.findPersonByTelephone(telephoneInput.getText());
                         setFields(tmp);
                     }
-                    catch(NullPointerException err)
+                    else
                     {
-                        System.out.println("3");
-                        description.setText("ERROR: CONTACT NOT FOUND");
+                        description.setText("ERROR: NO FIELDS WERE FILLED");
                     }
                 }
-                else
+                catch(NullPointerException err)
                 {
-                    description.setText("ERROR: NO FIELDS WERE FILLED");
+                    description.setText("ERROR: CONTACT NOT FOUND");
                 }
             }
             private void setFields(Person tmp)
