@@ -871,18 +871,18 @@ public class AppointmentFrame extends JFrame
                 {
                     if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
                     {
-                        Person tmp = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());
-                        setFields(tmp);
+                        Person p = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());
+                        setFields(p);
                     }
                     else if(!emailInput.getText().equals(""))
                     {
-                        Person tmp = contacts.findPersonByEmail(emailInput.getText());
-                        setFields(tmp);
+                        Person p = contacts.findPersonByEmail(emailInput.getText());
+                        setFields(p);
                     }
                     else if(!telephoneInput.getText().equals(""))
                     {
-                        Person tmp = contacts.findPersonByTelephone(telephoneInput.getText());
-                        setFields(tmp);
+                        Person p = contacts.findPersonByTelephone(telephoneInput.getText());
+                        setFields(p);
                     }
                     else
                     {
@@ -894,13 +894,13 @@ public class AppointmentFrame extends JFrame
                     description.setText("ERROR: CONTACT NOT FOUND");
                 }
             }
-            private void setFields(Person tmp)
+            private void setFields(Person p)
             {
-                firstNameInput.setText(tmp.getFirstName());
-                lastNameInput.setText(tmp.getLastName());
-                addressInput.setText(tmp.getAddress());
-                telephoneInput.setText(tmp.getTelephone());
-                emailInput.setText(tmp.getEmail());
+                firstNameInput.setText(p.getFirstName());
+                lastNameInput.setText(p.getLastName());
+                addressInput.setText(p.getAddress());
+                telephoneInput.setText(p.getTelephone());
+                emailInput.setText(p.getEmail());
             }
         }
         findButton.addActionListener(new FindButtonListener());
