@@ -9,27 +9,56 @@ import java.io.IOException;
 
 public class Contacts
 {
+    //instance variables
     private LinkedList<Person> people;
+    private String contactFileName;
+    private PersonEmailComparator emailComparator;
+    private PersonTelephoneComparator telephoneComparator;
     
-    public Contacts() throws IOException, InputMismatchException
+    /**
+     * Constructor for Contacts
+     * 
+     * @param contactFileName the file from which to read the contacts
+     */
+    public Contacts(String contactFileName) throws IOException, InputMismatchException
     {
         people = new LinkedList<Person>();
+        this.contactFileName = contactFileName;
+        emailComparator = new PersonEmailComparator();
+        telephoneComparator = new PersonTelephoneComparator();
         readContactsFile();
+        System.out.println(people);
     }
     
+    /**
+     * finds a Person object with the same email
+     * string as provided
+     * 
+     * @param email the email to compare
+     * @return a pointer to the found Person object or null
+     */
     public Person findPersonByEmail(String email)
     {
+        Person tmp = new Person("", "", "", "", email);
         for(Person i : people)
         {
-            if(i.getEmail().equals(email))
+            if(emailComparator.compare(i, tmp) == 0)
             {
                 return i;
             }
         }
         return null;
     }
-        
-    public Person findPersonByName(String firstName, String lastName)
+    
+    /**
+     * finds a Person object with the given first
+     * and last name strings
+     * 
+     * @param lastName the last name belonging to the Person object
+     * @param firstName the first name belonging to the Person object
+     * @return a pointer to the found Person object or null
+     */
+    public Person findPersonByName(String lastName, String firstName)
     {
         Person tmp = new Person(lastName, firstName, "", "", "");
         for(Person contact : people)
@@ -42,11 +71,19 @@ public class Contacts
         return null;
     }
     
+    /**
+     * finds a Person object with a matching
+     * telephone string to the one provided
+     * 
+     * @param telephone the phone number of the Person to be found
+     * @return a pointer to the found Person or null
+     */
     public Person findPersonByTelephone(String telephone)
     {
+        Person tmp = new Person("", "", telephone, "", "");
         for(Person i : people)
         {
-            if(i.getTelephone().equals(telephone))
+            if(telephoneComparator.compare(i, tmp) == 0)
             {
                 return i;
             }
@@ -54,15 +91,18 @@ public class Contacts
         return null;
     }
     
+    /**
+     * reads the contacts from the file given in
+     * the constructor of the class
+     */
     public void readContactsFile() throws IOException, InputMismatchException
     {
-        String contactFileName = "contacts.txt";
         Scanner contactFile = new Scanner(new File(contactFileName));
-        int count = -1;
+        int count = -2;
         while(contactFile.hasNext())
         {
-            count++;
             contactFile.next();
+            count++;
         }
         if(count % 5 != 0)
         {
@@ -71,26 +111,31 @@ public class Contacts
         contactFile = new Scanner(new File(contactFileName));
         
         int numOfContacts = contactFile.nextInt();
+        contactFile.nextLine();
         for(int i = 0; i < numOfContacts; i++)
         {
-            String lastName = contactFile.next();
+            String lastName = contactFile.nextLine();
             testInput(lastName, people);
-            String firstName = contactFile.next();
+            String firstName = contactFile.nextLine();
             testInput(firstName, people);
-            String address = contactFile.next();
+            String address = contactFile.nextLine();
             testInput(address, people);
-            String telephone = contactFile.next();
+            String telephone = contactFile.nextLine();
             testInput(telephone, people);
-            String email = contactFile.next();
+            String email = contactFile.nextLine();
             testInput(email, people);
             people.add(new Person(lastName, firstName, address, telephone, email));
         }
         contactFile.close();
         Collections.sort(people);
-        //count = Integer.parseInt(contactFile.next());
-        //System.out.println(count);
     }
     
+    /**
+     * tests the field to check if it is an empty string and
+     * clears the list and throws an InputMismatchException if it is
+     * 
+     * @throws InputMismatchException throw an exception when the field is blank
+     */
     private void testInput(String input, LinkedList<Person> list) throws InputMismatchException
     {
         if(input.equals(""))
@@ -100,9 +145,15 @@ public class Contacts
         }
     }
     
+    /**
+     * writes the fields of each person object in the list to
+     * the contactsFile specified in the constructor
+     * 
+     * @throws IOException PrintWriter and File throw IOExceptions
+     */
     public void writeContactsFile() throws IOException
     {
-        PrintWriter contactFile = new PrintWriter(new File("contacts.txt"));
+        PrintWriter contactFile = new PrintWriter(new File(contactFileName));
         contactFile.println(people.size());
         for(Person p : people)
         {

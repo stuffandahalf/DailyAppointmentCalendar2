@@ -35,6 +35,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.border.LineBorder;
 
 
 
@@ -148,7 +149,7 @@ public class AppointmentFrame extends JFrame
         appointmentsStack = new Stack<Appointment>();                                   //initialize appointmentsStack as a pointer to a new stack to store Appointment objects as they are added
         try
         {
-            contacts = new Contacts();
+            contacts = new Contacts("contacts.txt");
         }
         catch(IOException e)
         {
@@ -341,7 +342,6 @@ public class AppointmentFrame extends JFrame
                 }
                 else
                 {
-                    //System.out.println("Invalid date entered");                         //print a message
                     description.setText("ERROR: INVALID DATE ENTERED");
                 }
                 yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
@@ -588,6 +588,9 @@ public class AppointmentFrame extends JFrame
                 {
                     appointments.remove(0);                                     //remove the first element
                 }
+                calendarPanel.removeAll();
+                createCalendar();
+                calendarPanel.revalidate();
                 getTodaysAppointments();                                        //refresh the textArea
             }
         }
@@ -645,6 +648,9 @@ public class AppointmentFrame extends JFrame
                 }
                 System.out.println(message);                                                //print the message to console to be able to retain the dates
                 JOptionPane.showMessageDialog(null, message);                               //show a message dialog with the sample dates added
+                calendarPanel.removeAll();
+                createCalendar();
+                calendarPanel.revalidate();
                 getTodaysAppointments();                                                    //run the getTodaysAppointments method to print them to the screen
 
             }
@@ -704,6 +710,15 @@ public class AppointmentFrame extends JFrame
             int i = previousMonthCalendar.get(Calendar.DAY_OF_MONTH) - remainingDays + 1;
             JButton calendarButton = new JButton(Integer.toString(i));
             calendarButton.setBackground(Color.GRAY);
+            for(int j = 0; j < appointments.size(); j++)
+            {
+                if(appointments.get(j).getDate().get(Calendar.MONTH) == previousMonth &&
+                    appointments.get(j).getDate().get(Calendar.DAY_OF_MONTH) == i)
+                {
+                    calendarButton.setBorder(new LineBorder(Color.ORANGE));
+                    break;
+                }
+            }
             class CalendarButtonListener implements ActionListener
             {
                 public void actionPerformed(ActionEvent e)
@@ -715,6 +730,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.removeAll();
                     createCalendar();
                     calendarPanel.revalidate();
+                    getTodaysAppointments();
                 }
             }
             calendarButton.addActionListener(new CalendarButtonListener());
@@ -729,6 +745,15 @@ public class AppointmentFrame extends JFrame
             {
                 calendarButton.setBackground(Color.RED);
             }
+            for(int j = 0; j < appointments.size(); j++)
+            {
+                if(appointments.get(j).getDate().get(Calendar.MONTH) == previousMonth &&
+                    appointments.get(j).getDate().get(Calendar.DAY_OF_MONTH) + 1 == i)
+                {
+                    calendarButton.setBorder(new LineBorder(Color.ORANGE));
+                    break;
+                }
+            }
             class CalendarButtonListener implements ActionListener
             {
                 public void actionPerformed(ActionEvent e)
@@ -739,6 +764,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.removeAll();
                     createCalendar();
                     calendarPanel.revalidate();
+                    getTodaysAppointments();
                 }
             }
             calendarButton.addActionListener(new CalendarButtonListener());
@@ -762,6 +788,7 @@ public class AppointmentFrame extends JFrame
                     calendarPanel.removeAll();
                     createCalendar();
                     calendarPanel.revalidate();
+                    getTodaysAppointments();
                 }
             }
             calendarButton.addActionListener(new CalendarActionListener());
@@ -788,6 +815,7 @@ public class AppointmentFrame extends JFrame
                         calendarPanel.removeAll();
                         createCalendar();
                         calendarPanel.revalidate();
+                        getTodaysAppointments();
                     }
                 }
                 calendarButton.addActionListener(new CalendarActionListener());
@@ -867,6 +895,7 @@ public class AppointmentFrame extends JFrame
         {
             public void actionPerformed(ActionEvent e)
             {
+                description.setText("");
                 try
                 {
                     if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
@@ -922,6 +951,7 @@ public class AppointmentFrame extends JFrame
                 telephoneInput.setText("");
                 emailInput.setText("");
                 addressInput.setText("");
+                description.setText("");
             }
         }
         clearButton.addActionListener(new ClearButtonListener());
