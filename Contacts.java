@@ -104,7 +104,7 @@ public class Contacts
      * @throws IOException Scanner may throw an IOException
      * @throws InputMismatchException if the contact file does not have enough lines
      */
-    public void readContactsFile() throws IOException, InputMismatchException
+    public void readContactsFile() throws IOException, InputMismatchException, NumberFormatException
     {
         Scanner contactFile = new Scanner(new File(contactFileName));                               //create a new Scanner from the 
         int count = -2;                                                                             //start the counter at a negative offset to ignore the first line
@@ -118,9 +118,7 @@ public class Contacts
             throw new InputMismatchException("Invalid number of lines in file " + contactFileName); //throw an InputMismatchException
         }
         contactFile = new Scanner(new File(contactFileName));                                       //reset the Scanner
-        
-        int numOfContacts = contactFile.nextInt();                                                  //read the number of contacts from the file
-        contactFile.nextLine();                                                                     //read in the rest of the line
+        int numOfContacts = Integer.parseInt(contactFile.nextLine());
         for(int i = 0; i < numOfContacts; i++)                                                      //for every contact stored in the file
         {
             String lastName = contactFile.nextLine();                                               //read in the lastname

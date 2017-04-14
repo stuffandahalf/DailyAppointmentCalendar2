@@ -111,6 +111,9 @@ public class AppointmentFrame extends JFrame
     private JPanel calendarPanel;
     private JPanel calendarSubPanelA;
     private JPanel calendarSubPanelB;
+    private JPanel calendarSubPanelC;
+    private JButton leftMonthButton;
+    private JButton rightMonthButton;
     
     private JPanel contactDescriptionPanel;
     
@@ -169,6 +172,10 @@ public class AppointmentFrame extends JFrame
         catch(InputMismatchException e)                                                 //catch InputMismatchException
         {
             description.setText(e.getMessage());                                        //write it to the description box
+        }
+        catch(NumberFormatException e)
+        {
+            description.setText(e.getMessage());
         }
         
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);                                           //sets the size of the JFrame to the constants WINDOW_WIDTH and WINDOW_HEIGHT
@@ -866,6 +873,41 @@ public class AppointmentFrame extends JFrame
         }
         
         calendarPanel.add(calendarSubPanelB, BorderLayout.CENTER);                          //add the calendar to the center of the calendarPanel
+        
+        calendarSubPanelC = new JPanel();
+        
+        leftMonthButton = new JButton("Prev");
+        class LeftMonthActionListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                date.set(Calendar.MONTH, date.get(Calendar.MONTH) - 1);
+                date.set(Calendar.DAY_OF_MONTH, 1);
+                monthLabel.setText(sdfMonth.format(date.getTime()));
+                dateLabel.setText(sdf.format(date.getTime()));
+                getTodaysAppointments();
+            }
+        }
+        leftMonthButton.addActionListener(new LeftMonthActionListener());
+        calendarSubPanelC.add(leftMonthButton);
+        
+        rightMonthButton = new JButton("Next");
+        class RightMonthActionListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                date.set(Calendar.MONTH, date.get(Calendar.MONTH) + 1);
+                date.set(Calendar.DAY_OF_MONTH, 1);
+                monthLabel.setText(sdfMonth.format(date.getTime()));
+                dateLabel.setText(sdf.format(date.getTime()));
+                getTodaysAppointments();
+            }
+        }
+        rightMonthButton.addActionListener(new RightMonthActionListener());
+        calendarSubPanelC.add(rightMonthButton);
+        
+        calendarPanel.add(calendarSubPanelC, BorderLayout.SOUTH);
+        
         rightPanel.add(calendarPanel);                                                      //add the calendarPanel to the rightPanel
     }
     
