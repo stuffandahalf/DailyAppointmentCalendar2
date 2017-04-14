@@ -114,12 +114,12 @@ public class Appointment implements Comparable<Appointment>                     
         String hour = Integer.toString(date.get(Calendar.HOUR_OF_DAY));             //variable to store the hour
         String minute = Integer.toString(date.get(Calendar.MINUTE));                //variable to store the minute
         String message = "";                                                        //a blank string for the message
-        if(hour.length() == 1)                                                      //if the hour is smaller than 10
+        if(Integer.parseInt(hour) < 10)                                                      //if the hour is smaller than 10
         {
             message += "0";                                                         //append a zero to the message
         }
         message += hour + ":";                                                      //append the hour and a colon to the message
-        if(minute.length() == 1)                                                    //if the minutes are below 10
+        if(Integer.parseInt(minute) < 10)                                                    //if the minutes are below 10
         {
             message += "0";                                                         //append a zero to the message
         }

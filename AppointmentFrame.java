@@ -326,24 +326,31 @@ public class AppointmentFrame extends JFrame
                 String year = yearInput.getText();                                      //get input from JTextFields
                 String month = monthInput.getText();
                 String day = dayInput.getText();
-                if(!year.equals("") &&                                                  //check if the date is a valid value
-                    !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
-                    !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
+                try
                 {
-                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
-                    date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
-                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                    if(!year.equals("") &&                                                  //check if the date is a valid value
+                        !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
+                        !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
+                    {
+                        date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
+                        date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
+                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                    }
+                    else                                                                    //if it is not
+                    {
+                        description.setText("ERROR: INVALID DATE ENTERED");                 //set the description box to the following message
+                    }
+                    yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
+                    monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
+                    dayInput.setText(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));
+                    monthLabel.setText(sdfMonth.format(date.getTime()));                    //update the monthLabel
+                    dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
+                    getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
                 }
-                else                                                                    //if it is not
+                catch(NumberFormatException e)                                          //catch invalid values being entered into the text field
                 {
-                    description.setText("ERROR: INVALID DATE ENTERED");                 //set the description box to the following message
+                    description.setText("ERROR: INVALID NUMBER WAS INPUT");             //set the description text to this error
                 }
-                yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
-                monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
-                dayInput.setText(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));
-                monthLabel.setText(sdfMonth.format(date.getTime()));                    //update the monthLabel
-                dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
-                getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
             }
         }
         showButton.addActionListener(new ShowButtonListener());                         //add the actionListener to the showButton
@@ -423,63 +430,69 @@ public class AppointmentFrame extends JFrame
                 
                 String hour = hourInput.getText();                                      //get the hour from the hourInput JTextField
                 String minute = minuteInput.getText();                                  //get the minute from the minuteInput JTextField
-                if(hour.equals("") || Integer.parseInt(hour) < 0 || Integer.parseInt(hour) > 23)	//if the given hours are blank or invalid
+                try
                 {
-                    description.setText("ERROR");                                       //set the description box to say ERROR
+                    if(hour.equals("") || Integer.parseInt(hour) < 0 || Integer.parseInt(hour) > 23)	//if the given hours are blank or invalid
+                    {
+                        description.setText("ERROR");                                       //set the description box to say ERROR
+                    }
+                    else                                                                    //otherwise
+                    {
+                        if(minute.equals("") && !(Integer.parseInt(minute) < 0 || Integer.parseInt(minute) > 59))       //if the given minutes are blank
+                        {
+                            minute = "0";                                                   //set minutes to 0
+                        }
+                        
+                        for(int i = 0; i < appointments.size(); i++)                        //for every index in appointments
+                        {
+                            if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //check if the appointment occurs at the given time
+                            {
+                                create = false;                                             //set the create variable to false
+                                description.setText("CONFLICT");                            //set the text of the description box to say CONFLICT
+                                break;                                                      //break the loop
+                            }
+                        }
+                        
+                        if(create)                                                          //if create was not set to false
+                        {
+                            Appointment newAppointment;                                     //create an Appointment variable
+                            if(lastNameInput.getText().equals("") ||                        //if there is not enough information
+                               firstNameInput.getText().equals("") ||                       //for a person object
+                               addressInput.getText().equals(""))
+                            {
+                                newAppointment = new Appointment(year,                      //create a new Appointment without a Person
+                                                                 month,                     //at the given time
+                                                                 day,
+                                                                 Integer.parseInt(hour),
+                                                                 Integer.parseInt(minute),
+                                                                 description.getText());
+                            }
+                            else                                                            //otherwise
+                            {
+                                newAppointment = new Appointment(year,                      //create a new Appointment with a Person object
+                                                                 month,
+                                                                 day,
+                                                                 Integer.parseInt(hour),
+                                                                 Integer.parseInt(minute),
+                                                                 description.getText(),
+                                                                 lastNameInput.getText(),
+                                                                 firstNameInput.getText(),
+                                                                 addressInput.getText(),
+                                                                 telephoneInput.getText(),
+                                                                 emailInput.getText());
+                            }
+                            description.setText("");                                        //clear the description text box
+                            appointments.add(newAppointment);                               //add the new appointment to the ArrayList
+                            appointmentsStack.push(newAppointment);                         //add the new appointment to the Stack
+                        }
+                        hourInput.setText("");                                              //clear the hourInput
+                        minuteInput.setText("");                                            //anf the minuteInput
+                        getTodaysAppointments();                                            //run the getTodaysAppointments method to print them to the screen
+                    }
                 }
-                else                                                                    //otherwise
+                catch(NumberFormatException e)                                          //catch invalid values being entered into the text fields
                 {
-                    if(minute.equals("") && !(Integer.parseInt(minute) < 0 || Integer.parseInt(minute) > 59))       //if the given minutes are blank
-                    {
-                        minute = "0";                                                   //set minutes to 0
-                    }
-                    
-                    for(int i = 0; i < appointments.size(); i++)                        //for every index in appointments
-                    {
-                        if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //check if the appointment occurs at the given time
-                        {
-                            create = false;                                             //set the create variable to false
-                            description.setText("CONFLICT");                            //set the text of the description box to say CONFLICT
-                            break;                                                      //break the loop
-                        }
-                    }
-                    
-                    if(create)                                                          //if create was not set to false
-                    {
-                        Appointment newAppointment;                                     //create an Appointment variable
-                        if(lastNameInput.getText().equals("") ||                        //if there is not enough information
-                           firstNameInput.getText().equals("") ||                       //for a person object
-                           addressInput.getText().equals(""))
-                        {
-                            newAppointment = new Appointment(year,                      //create a new Appointment without a Person
-                                                             month,                     //at the given time
-                                                             day,
-                                                             Integer.parseInt(hour),
-                                                             Integer.parseInt(minute),
-                                                             description.getText());
-                        }
-                        else                                                            //otherwise
-                        {
-                            newAppointment = new Appointment(year,                      //create a new Appointment with a Person object
-                                                             month,
-                                                             day,
-                                                             Integer.parseInt(hour),
-                                                             Integer.parseInt(minute),
-                                                             description.getText(),
-                                                             lastNameInput.getText(),
-                                                             firstNameInput.getText(),
-                                                             addressInput.getText(),
-                                                             telephoneInput.getText(),
-                                                             emailInput.getText());
-                        }
-                        description.setText("");                                        //clear the description text box
-                        appointments.add(newAppointment);                               //add the new appointment to the ArrayList
-                        appointmentsStack.push(newAppointment);                         //add the new appointment to the Stack
-                    }
-                    hourInput.setText("");                                              //clear the hourInput
-                    minuteInput.setText("");                                            //anf the minuteInput
-                    getTodaysAppointments();                                            //run the getTodaysAppointments method to print them to the screen
-                    
+                    description.setText("ERROR: INVALID NUMBER WAS INPUT");             //set the description text to this error
                 }
             }
         }
@@ -512,21 +525,28 @@ public class AppointmentFrame extends JFrame
                     {
                         minute = "0";                                                   //set the minutes to 0
                     }
-                    for(int i = 0; i < appointments.size(); i++)                        //for every index in the ArrayList
+                    try
                     {
-                        if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //if the appointment occurs on the given time
+                        for(int i = 0; i < appointments.size(); i++)                        //for every index in the ArrayList
                         {
-                            appointments.remove(i);                                     //remove the appointment from the arrayList
-                            break;                                                      //break the loop
+                            if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //if the appointment occurs on the given time
+                            {
+                                appointments.remove(i);                                     //remove the appointment from the arrayList
+                                break;                                                      //break the loop
+                            }
+                        }
+                        for(int i = 0; i < appointmentsStack.size(); i++)                   //repeat the same for the AppointmentStack
+                        {
+                            if(appointmentsStack.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))
+                            {
+                                appointmentsStack.remove(i);
+                                break;
+                            }
                         }
                     }
-                    for(int i = 0; i < appointmentsStack.size(); i++)                   //repeat the same for the AppointmentStack
+                    catch(NumberFormatException e)                                      //handle invalid values being entered into the fields
                     {
-                        if(appointmentsStack.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))
-                        {
-                            appointmentsStack.remove(i);
-                            break;
-                        }
+                        description.setText("ERROR: INVALID NUMBER WAS INPUT");         //set the description text to this error
                     }
                     hourInput.setText("");                                              //clear the HourInput
                     minuteInput.setText("");                                            //and the minuteInput
