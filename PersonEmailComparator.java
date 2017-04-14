@@ -1,3 +1,8 @@
+//Name: Gregory Norton
+//Student ID: 500766165
+//Class: CPS 209
+
+
 import java.util.Comparator;
 
 public class PersonEmailComparator implements Comparator<Person>

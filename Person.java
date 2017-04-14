@@ -1,3 +1,8 @@
+//Name: Gregory Norton
+//Student ID: 500766165
+//Class: CPS 209
+
+
 public class Person implements Comparable<Person>
 {
     private String lastName;
@@ -15,23 +20,23 @@ public class Person implements Comparable<Person>
      * @param address the address of the Person
      * @param email the email address of the Person
      */
-    public Person(String lastName, String firstName, String telephone, String address, String email)
+    public Person(String lastName, String firstName, String address, String telephone, String email)
     {
         this.lastName = lastName;
         this.firstName = firstName;
-        this.telephone = telephone;
         this.address = address;
+        this.telephone = telephone;
         this.email = email;
     }
     
     /**
      * converts the class to a string
      * 
-     * @return the string represnting the object
+     * @return the string representing the object
      */
     public String toString()
     {
-        return(firstName + " " + lastName + "\n" + telephone + "\n" + address + "\n" + email);
+        return(firstName + " " + lastName + "\n" + address + "\n" + telephone + "\n" + email);
     }
     
     /**
@@ -42,14 +47,13 @@ public class Person implements Comparable<Person>
      */
     public int compareTo(Person other)
     {
-        //System.out.println(lastName.toLowerCase());
-        if(lastName.toLowerCase().equals(other.lastName.toLowerCase()))
+        if(lastName.toLowerCase().equals(other.lastName.toLowerCase()))                 //if the lastname of both Person objects are the same
         {
-            return(firstName.toLowerCase().compareTo(other.firstName.toLowerCase()));
+            return(firstName.toLowerCase().compareTo(other.firstName.toLowerCase()));   //compare the firstnames and return the result
         }
-        else
+        else                                                                            //otherwise
         {
-            return(lastName.toLowerCase().compareTo(other.lastName.toLowerCase()));
+            return(lastName.toLowerCase().compareTo(other.lastName.toLowerCase()));     //compare the lastnames and return the result
         }
     }
     
