@@ -35,6 +35,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.border.LineBorder;
 
 
 
@@ -110,6 +111,9 @@ public class AppointmentFrame extends JFrame
     private JPanel calendarPanel;
     private JPanel calendarSubPanelA;
     private JPanel calendarSubPanelB;
+    private JPanel calendarSubPanelC;
+    private JButton leftMonthButton;
+    private JButton rightMonthButton;
     
     private JPanel contactDescriptionPanel;
     
@@ -143,31 +147,36 @@ public class AppointmentFrame extends JFrame
         super();                                                                        //call superclass constructor
         date = new GregorianCalendar();                                                 //initialize variable date as a pointer to a new GregorianCalendar object
         sdf = new SimpleDateFormat("EEE, MMM dd, yyyy");                                //initialize variable sdf as a pointer to a new SimpleDateFormat
-        sdfMonth = new SimpleDateFormat("MMM");
+        sdfMonth = new SimpleDateFormat("MMM");                                         //initialize varabke sdfMonth as a pointer to a new SimpleDateFormat to format the date
         appointments = new ArrayList<Appointment>();                                    //initialize appointments as a pointer to a new ArrayList for storing Appointment objects
         appointmentsStack = new Stack<Appointment>();                                   //initialize appointmentsStack as a pointer to a new stack to store Appointment objects as they are added
-        try
-        {
-            contacts = new Contacts();
-        }
-        catch(IOException e)
-        {
-            System.out.println(e);
-        }
-        catch(InputMismatchException e)
-        {
-            System.out.println(e);
-        }
-        centralPanel = new JPanel(new GridLayout(1, 2));
-        add(centralPanel);
+        centralPanel = new JPanel(new GridLayout(1, 2));                                //create a central panel to split the fram into left and right sections
+        add(centralPanel);                                                              //add the panel to the frame
         
-        leftPanel = new JPanel(new BorderLayout());
-        centralPanel.add(leftPanel);
-        rightPanel = new JPanel(new BorderLayout());
+        leftPanel = new JPanel(new BorderLayout());                                     //initialize the leftPanel as a new JPanel with a BorderLayout
+        centralPanel.add(leftPanel);                                                    //add the leftPanel to the centralPanel
+        rightPanel = new JPanel(new BorderLayout());                                    //repeat for the rightPanel
         centralPanel.add(rightPanel);
         
-        createLeftPanel();
-        createRightPanel();
+        createLeftPanel();                                                              //run the method to construct and add the contents of the leftPanel
+        createRightPanel();                                                             //run the method to construct and add the contents of the rightPanel
+        
+        try                                                                             //try
+        {
+            contacts = new Contacts("contacts.txt");                                    //to initialize contacts as a new Contacts object with input file of contacts.txt
+        }
+        catch(IOException e)                                                            //catch IOException
+        {
+            description.setText(e.getMessage());                                        //write it to the description box
+        }
+        catch(InputMismatchException e)                                                 //catch InputMismatchException
+        {
+            description.setText(e.getMessage());                                        //write it to the description box
+        }
+        catch(NumberFormatException e)
+        {
+            description.setText(e.getMessage());
+        }
         
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);                                           //sets the size of the JFrame to the constants WINDOW_WIDTH and WINDOW_HEIGHT
         setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));                     //sets the minimum size of the JFrame to the same constants
@@ -189,9 +198,9 @@ public class AppointmentFrame extends JFrame
      */
     private void createRightPanel()
     {
-        createMonthLabel();
-        createCalendar();
-        createContactDescriptionPanel();
+        createMonthLabel();                                             //run the createMonthLabel method
+        createCalendar();                                               //run the createCalendar method
+        createContactDescriptionPanel();                                //run the createContactDescriptionPanel
     }
     
     /**
@@ -199,8 +208,8 @@ public class AppointmentFrame extends JFrame
      */
     private void createDateLabel()
     {
-        dateLabel = new JLabel(sdf.format(date.getTime()));                             //initializes the dateLabel variable to point to a new JLabel object which displays the current date
-        leftPanel.add(dateLabel, BorderLayout.NORTH);                                             //add the label object to the north part of the JFrame
+        dateLabel = new JLabel(sdf.format(date.getTime()));             //initializes the dateLabel variable to point to a new JLabel object which displays the current date
+        leftPanel.add(dateLabel, BorderLayout.NORTH);                   //add the label object to the north part of the JFrame
     }
     
     /**
@@ -208,10 +217,10 @@ public class AppointmentFrame extends JFrame
      */
     private void createTextArea()
     {
-        textArea = new JTextArea();                                                     //initialize the textArea as a pointer to a new JTextArea object
-        textArea.setEditable(false);                                                    //disable editing the text in the JTextArea
-        scrollPane = new JScrollPane(textArea);                                         //create a new JScrollPane fromm the JTextArea to make it scrollable
-        leftPanel.add(scrollPane, BorderLayout.CENTER);                                           //add the scrollPane to the center of the JFrame
+        textArea = new JTextArea();                                     //initialize the textArea as a pointer to a new JTextArea object
+        textArea.setEditable(false);                                    //disable editing the text in the JTextArea
+        scrollPane = new JScrollPane(textArea);                         //create a new JScrollPane fromm the JTextArea to make it scrollable
+        leftPanel.add(scrollPane, BorderLayout.CENTER);                 //add the scrollPane to the center of the JFrame
     }
     
     
@@ -220,13 +229,12 @@ public class AppointmentFrame extends JFrame
      */
     private void createControlPanel()
     {
-        controlPanel = new JPanel(new BorderLayout());                                  //create a new panel for the control panel
-        createDateSubpanel();                                                           //call the createDateSubpanel method
-        createAppointmentSubpanel();                                                         //call the createActionSubpanel method
+        controlPanel = new JPanel(new BorderLayout());                  //create a new panel for the control panel
+        createDateSubpanel();                                           //call the createDateSubpanel method
+        createAppointmentSubpanel();                                    //call the createActionSubpanel method
         
-        leftPanel.add(controlPanel, BorderLayout.SOUTH);                                          //add the controlPanel to the south of the JFrame
+        leftPanel.add(controlPanel, BorderLayout.SOUTH);                //add the controlPanel to the south of the JFrame
     }
-    
     
     /**
      * create the subpanel to adjust the date
@@ -245,18 +253,18 @@ public class AppointmentFrame extends JFrame
         
         subDatePanelB = new JPanel();                                                   //create another subpanel with the flow layout to store the inputs and labels
         
-        dayInputLabel = new JLabel("Day");                                                   //initialize the dayLabel as a pointer to a new JLabel object with label Day
-        subDatePanelB.add(dayInputLabel);                                                    //add the label to the subpanel
+        dayInputLabel = new JLabel("Day");                                              //initialize the dayLabel as a pointer to a new JLabel object with label Day
+        subDatePanelB.add(dayInputLabel);                                               //add the label to the subpanel
         dayInput = new JTextField(Integer.toString(date.get(Calendar.DAY_OF_MONTH)), 2);//initialize the dayInput as a pointer to a new JTextField with default text of the current day and a size of 2 columns
         subDatePanelB.add(dayInput);                                                    //add the dayinput to the subpanel
         
-        monthInputLabel = new JLabel("Month");                                               //initialize the monthInputLabel as a pointer to a new JLabel object with label Month
-        subDatePanelB.add(monthInputLabel);                                                  //add the label to the subpanel
+        monthInputLabel = new JLabel("Month");                                          //initialize the monthInputLabel as a pointer to a new JLabel object with label Month
+        subDatePanelB.add(monthInputLabel);                                             //add the label to the subpanel
         monthInput = new JTextField(Integer.toString(date.get(Calendar.MONTH)+1), 2);   //initialize the monthInput as a pointer to a new JTextField with default text of the current month and a size of 2 columns
         subDatePanelB.add(monthInput);                                                  //add the monthInput to the subpanel
         
-        yearInputLabel = new JLabel("Year");                                                 //initialize the yearLabel as a pointer to a new JLabel object with label Year
-        subDatePanelB.add(yearInputLabel);                                                   //add the label to the subpanel
+        yearInputLabel = new JLabel("Year");                                            //initialize the yearLabel as a pointer to a new JLabel object with label Year
+        subDatePanelB.add(yearInputLabel);                                              //add the label to the subpanel
         yearInput = new JTextField(Integer.toString(date.get(Calendar.YEAR)), 4);       //initialize the yearInput as a pointer to a new JTextField with default text of the current year and a size of 4 columns
         subDatePanelB.add(yearInput);                                                   //add the yearInput to the subpanel
         datePanel.add(subDatePanelB, BorderLayout.CENTER);                              //add the subpanel to the datePanel
@@ -278,10 +286,8 @@ public class AppointmentFrame extends JFrame
             public void actionPerformed(ActionEvent evt)                                //override the actionPerformed method
             {
                 date.add(Calendar.DAY_OF_MONTH, -1);                                    //add -1 days to the current date
-                monthLabel.setText(sdfMonth.format(date.getTime()));
+                monthLabel.setText(sdfMonth.format(date.getTime()));                    //update the monthLabel
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
-                calendarPanel.removeAll();
-                createCalendar();
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
         }
@@ -302,10 +308,8 @@ public class AppointmentFrame extends JFrame
             public void actionPerformed(ActionEvent evt)                                //create a nested class to implement the ActionListener interface
             {
                 date.add(Calendar.DAY_OF_MONTH, 1);                                     //add 1 day to the current date
-                monthLabel.setText(sdfMonth.format(date.getTime()));
+                monthLabel.setText(sdfMonth.format(date.getTime()));                    //update the monthLabel
                 dateLabel.setText(sdf.format(date.getTime()));                          //set the content of the dateLabel to be the new date
-                calendarPanel.removeAll();
-                createCalendar();
                 getTodaysAppointments();                                                //run the getTodaysAppointments method
             }
         }
@@ -329,27 +333,31 @@ public class AppointmentFrame extends JFrame
                 String year = yearInput.getText();                                      //get input from JTextFields
                 String month = monthInput.getText();
                 String day = dayInput.getText();
-                if(!year.equals("") &&                                                  //check if the date is a valid value
-                    !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
-                    !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
+                try
                 {
-                    date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
-                    date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
-                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
-                    calendarPanel.removeAll();
-                    createCalendar();
+                    if(!year.equals("") &&                                                  //check if the date is a valid value
+                        !month.equals("") && Integer.parseInt(month) > 0 && Integer.parseInt(month) < 13 &&
+                        !day.equals("") && Integer.parseInt(day) > 0 && Integer.parseInt(day) < date.getActualMaximum(Calendar.DAY_OF_MONTH))
+                    {
+                        date.set(Calendar.YEAR, Integer.parseInt(yearInput.getText()));     //set the date to the one that was input
+                        date.set(Calendar.MONTH, Integer.parseInt(monthInput.getText())-1);
+                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dayInput.getText()));
+                    }
+                    else                                                                    //if it is not
+                    {
+                        description.setText("ERROR: INVALID DATE ENTERED");                 //set the description box to the following message
+                    }
+                    yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
+                    monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
+                    dayInput.setText(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));
+                    monthLabel.setText(sdfMonth.format(date.getTime()));                    //update the monthLabel
+                    dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
+                    getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
                 }
-                else
+                catch(NumberFormatException e)                                          //catch invalid values being entered into the text field
                 {
-                    //System.out.println("Invalid date entered");                         //print a message
-                    description.setText("ERROR: INVALID DATE ENTERED");
+                    description.setText("ERROR: INVALID NUMBER WAS INPUT");             //set the description text to this error
                 }
-                yearInput.setText(Integer.toString(date.get(Calendar.YEAR)));           //set the text in the textFields for the year
-                monthInput.setText(Integer.toString(date.get(Calendar.MONTH)+1));       //month, and day to represent the current date
-                dayInput.setText(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));
-                monthLabel.setText(sdfMonth.format(date.getTime()));
-                dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
-                getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
             }
         }
         showButton.addActionListener(new ShowButtonListener());                         //add the actionListener to the showButton
@@ -363,6 +371,9 @@ public class AppointmentFrame extends JFrame
      */
     private void getTodaysAppointments()
     {
+        calendarPanel.removeAll();                                                      //remove everything from the calendarPanel
+        createCalendar();                                                               //rerun the createCalendar method
+        calendarPanel.revalidate();                                                     //revalidate the calendarPanel
         textArea.setText("");                                                           //clear the textArea of all old appointments
         Collections.sort(appointments);                                                 //sort the appointments ArrayList
         for(int i = 0; i < appointments.size(); i++)                                    //for every index in the ArrayList
@@ -403,7 +414,7 @@ public class AppointmentFrame extends JFrame
         subAppointmentPanelB = new JPanel();                                            //make another subpanel
         createCreateButton();                                                           //run the createCreateButton method
         createCancelButton();                                                           //run the createCancelButton method
-        createRecallButton();
+        createRecallButton();                                                           //run the createRecallButton method
         appointmentPanel.add(subAppointmentPanelB, BorderLayout.CENTER);                //add the subpanel to the main actionPanel
         
         controlPanel.add(appointmentPanel, BorderLayout.CENTER);                        //add the actionPanel to the controlPanel
@@ -426,35 +437,69 @@ public class AppointmentFrame extends JFrame
                 
                 String hour = hourInput.getText();                                      //get the hour from the hourInput JTextField
                 String minute = minuteInput.getText();                                  //get the minute from the minuteInput JTextField
-                if(hour.equals("") || Integer.parseInt(hour) < 0 || Integer.parseInt(hour) > 23)	//if the given hours are blank or invalid
+                try
                 {
-                    description.setText("ERROR");                                       //set the description box to say ERROR
-                }
-                else                                                                    //otherwise
-                {
-                    if(minute.equals("") && !(Integer.parseInt(minute) < 0 || Integer.parseInt(minute) > 59))                                               //if the given minutes are blank
+                    if(hour.equals("") || Integer.parseInt(hour) < 0 || Integer.parseInt(hour) > 23)	//if the given hours are blank or invalid
                     {
-                        minute = "0";                                                   //set minutes to 0
+                        description.setText("ERROR");                                       //set the description box to say ERROR
                     }
-                    
-                    for(int i = 0; i < appointments.size(); i++)                        //for every index in appointments
+                    else                                                                    //otherwise
                     {
-                        if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //check if the appointment occurs at the given time
+                        if(minute.equals("") && !(Integer.parseInt(minute) < 0 || Integer.parseInt(minute) > 59))       //if the given minutes are blank
                         {
-                            create = false;                                             //set the create variable to false
-                            description.setText("CONFLICT");                            //set the text of the description box to say CONFLICT
-                            break;                                                      //break the loop
+                            minute = "0";                                                   //set minutes to 0
                         }
+                        
+                        for(int i = 0; i < appointments.size(); i++)                        //for every index in appointments
+                        {
+                            if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //check if the appointment occurs at the given time
+                            {
+                                create = false;                                             //set the create variable to false
+                                description.setText("CONFLICT");                            //set the text of the description box to say CONFLICT
+                                break;                                                      //break the loop
+                            }
+                        }
+                        
+                        if(create)                                                          //if create was not set to false
+                        {
+                            Appointment newAppointment;                                     //create an Appointment variable
+                            if(lastNameInput.getText().equals("") ||                        //if there is not enough information
+                               firstNameInput.getText().equals("") ||                       //for a person object
+                               addressInput.getText().equals(""))
+                            {
+                                newAppointment = new Appointment(year,                      //create a new Appointment without a Person
+                                                                 month,                     //at the given time
+                                                                 day,
+                                                                 Integer.parseInt(hour),
+                                                                 Integer.parseInt(minute),
+                                                                 description.getText());
+                            }
+                            else                                                            //otherwise
+                            {
+                                newAppointment = new Appointment(year,                      //create a new Appointment with a Person object
+                                                                 month,
+                                                                 day,
+                                                                 Integer.parseInt(hour),
+                                                                 Integer.parseInt(minute),
+                                                                 description.getText(),
+                                                                 lastNameInput.getText(),
+                                                                 firstNameInput.getText(),
+                                                                 addressInput.getText(),
+                                                                 telephoneInput.getText(),
+                                                                 emailInput.getText());
+                            }
+                            description.setText("");                                        //clear the description text box
+                            appointments.add(newAppointment);                               //add the new appointment to the ArrayList
+                            appointmentsStack.push(newAppointment);                         //add the new appointment to the Stack
+                        }
+                        hourInput.setText("");                                              //clear the hourInput
+                        minuteInput.setText("");                                            //anf the minuteInput
+                        getTodaysAppointments();                                            //run the getTodaysAppointments method to print them to the screen
                     }
-                    
-                    if(create)                                                          //if create was not set to false
-                    {
-                        Appointment newAppointment = new Appointment(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute), description.getText());    //make a new appointment at the given time
-                        description.setText("");                                        //clear the description text box
-                        appointments.add(newAppointment);                               //add the new appointment to the ArrayList
-                        appointmentsStack.push(newAppointment);                         //add the new appointment to the Stack
-                    }
-                    getTodaysAppointments();                                            //run the getTodaysAppointments method to print them to the screen
+                }
+                catch(NumberFormatException e)                                          //catch invalid values being entered into the text fields
+                {
+                    description.setText("ERROR: INVALID NUMBER WAS INPUT");             //set the description text to this error
                 }
             }
         }
@@ -487,28 +532,37 @@ public class AppointmentFrame extends JFrame
                     {
                         minute = "0";                                                   //set the minutes to 0
                     }
-                    for(int i = 0; i < appointments.size(); i++)                        //for every index in the ArrayList
+                    try
                     {
-                        if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //if the appointment occurs on the given time
+                        for(int i = 0; i < appointments.size(); i++)                        //for every index in the ArrayList
                         {
-                            appointments.remove(i);                                     //remove the appointment from the arrayList
-                            break;                                                      //break the loop
+                            if(appointments.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))    //if the appointment occurs on the given time
+                            {
+                                appointments.remove(i);                                     //remove the appointment from the arrayList
+                                break;                                                      //break the loop
+                            }
+                        }
+                        for(int i = 0; i < appointmentsStack.size(); i++)                   //repeat the same for the AppointmentStack
+                        {
+                            if(appointmentsStack.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))
+                            {
+                                appointmentsStack.remove(i);
+                                break;
+                            }
                         }
                     }
-                    for(int i = 0; i < appointmentsStack.size(); i++)
+                    catch(NumberFormatException e)                                      //handle invalid values being entered into the fields
                     {
-                        if(appointmentsStack.get(i).occursOn(year, month, day, Integer.parseInt(hour), Integer.parseInt(minute)))
-                        {
-                            appointmentsStack.remove(i);
-                            break;
-                        }
+                        description.setText("ERROR: INVALID NUMBER WAS INPUT");         //set the description text to this error
                     }
+                    hourInput.setText("");                                              //clear the HourInput
+                    minuteInput.setText("");                                            //and the minuteInput
                     getTodaysAppointments();                                            //run the getTodaysAppointments method to display the remaining appointments
                 }
             }
         }
         cancelButton.addActionListener(new CancelButtonListener());                     //add the ActionListener to the cancelButton
-        subAppointmentPanelB.add(cancelButton);                                              //add the cancelButton to the second action subpanel
+        subAppointmentPanelB.add(cancelButton);                                         //add the cancelButton to the second action subpanel
     }
     
     /**
@@ -519,44 +573,36 @@ public class AppointmentFrame extends JFrame
         recallButton = new JButton("Recall");
         class RecallButtonListener implements ActionListener
         {
-            public void actionPerformed(ActionEvent evt)
+            public void actionPerformed(ActionEvent evt)                                    //override the actionPerformed method from interface ActionListener
             {
-                if(!appointmentsStack.empty())
+                if(!appointmentsStack.empty())                                              //if the appointmentsStack is not empty
                 {
-                    //SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd, yyyy");
-                    //System.out.println("Recall button was pressed, replace later");
-                    Appointment lastAppointment = appointmentsStack.peek();
-                    Calendar appointmentDate = lastAppointment.getDate();
-                    int day = appointmentDate.get(Calendar.DAY_OF_MONTH);
-                    int month = appointmentDate.get(Calendar.MONTH) + 1;
-                    int year = appointmentDate.get(Calendar.YEAR);
-                    int hour = appointmentDate.get(Calendar.HOUR_OF_DAY);
-                    int minutes = appointmentDate.get(Calendar.MINUTE);
-                    //System.out.println(minutes);
-                    dayInput.setText(Integer.toString(day));
-                    monthInput.setText(Integer.toString(month));
-                    yearInput.setText(Integer.toString(year));
-                    hourInput.setText(Integer.toString(hour));
-                    minuteInput.setText(Integer.toString(minutes));
-                    date = appointmentDate;
-                    monthLabel.setText(sdfMonth.format(date.getTime()));
+                    Appointment lastAppointment = appointmentsStack.peek();                 //retrieve the last added appointment
+                    Calendar appointmentDate = lastAppointment.getDate();                   //store the date of the appointment in a Calendar variable
+                    int day = appointmentDate.get(Calendar.DAY_OF_MONTH);                   //store the day,
+                    int month = appointmentDate.get(Calendar.MONTH) + 1;                    //month
+                    int year = appointmentDate.get(Calendar.YEAR);                          //year
+                    int hour = appointmentDate.get(Calendar.HOUR_OF_DAY);                   //hour
+                    int minutes = appointmentDate.get(Calendar.MINUTE);                     //and minutes in their own variables
+                    dayInput.setText(Integer.toString(day));                                //set the dayInput text to the day
+                    monthInput.setText(Integer.toString(month));                            //monthInput to month
+                    yearInput.setText(Integer.toString(year));                              //yearInput to year
+                    hourInput.setText(Integer.toString(hour));                              //hourInput to hour
+                    minuteInput.setText(Integer.toString(minutes));                         //minuteInput to minutes
+                    date = appointmentDate;                                                 //set the date to the date of the last appointment added
+                    monthLabel.setText(sdfMonth.format(date.getTime()));                    //set the mothLabel to the new month
                     dateLabel.setText(sdf.format(date.getTime()));                          //set the text of the dateLabel to the current date
                     getTodaysAppointments();                                                //run getTodaysAppointments to show the appointments for that date
             
                 }
-                else
+                else                                                                        //if there are no appointments in the stack
                 {
-                    /*dayInput.setText("");
-                    monthInput.setText("");
-                    yearInput.setText("");
-                    hourInput.setText("");
-                    minuteInput.setText("");*/
-		    description.setText("ERROR: NO APPOINTMENTS TO RECALL");
+                    description.setText("ERROR: NO APPOINTMENTS TO RECALL");                //set the description text to inform the user
                 }
             }
         }
-        recallButton.addActionListener(new RecallButtonListener());
-        subAppointmentPanelB.add(recallButton);
+        recallButton.addActionListener(new RecallButtonListener());                         //add the actionListener to the recallButton
+        subAppointmentPanelB.add(recallButton);                                             //add the recallButton to the appointmentPanel
     }
     
     /**
@@ -606,10 +652,12 @@ public class AppointmentFrame extends JFrame
             private Appointment[] samples = {                                               //array of sample Appointment objects
                 new Appointment(2017, 12, 12, 12, 12, "It will be 12:12 on 12/12"),
                 new Appointment(2011, 11, 11, 11, 11, "It was 11:11 on 11/11/11"),
-                new Appointment(1983, 4, 13, 3, 23, "This was a random date"),
-                new Appointment(2117, 3, 20, 11, 59, "100 years after this assignment is due"),
-                new Appointment(2006, 7, 3, 1, 12, "It is late"),
-                new Appointment(2017, 12, 12, 12, 13, "This also happens")
+                new Appointment(2017, 04, 13, 11, 30, "This assignment is due"),
+                new Appointment(2017, 04, 22, 9, 0, "CPS 310 Exam"),
+                new Appointment(2017, 04, 24, 8, 0, "CPS 209 Exam"),
+                new Appointment(2017, 04, 25, 8, 0, "MTH 207 Exam"),
+                new Appointment(2017, 04, 25, 12, 0, "FNU 101 Exam"),
+                new Appointment(2017, 04, 27, 9, 0, "CPS 393 Exam")
             };
             
             public void actionPerformed(ActionEvent e)
@@ -658,8 +706,8 @@ public class AppointmentFrame extends JFrame
      */
     private void createMonthLabel()
     {
-        monthLabel = new JLabel(sdfMonth.format(date.getTime()));
-        rightPanel.add(monthLabel, BorderLayout.NORTH);
+        monthLabel = new JLabel(sdfMonth.format(date.getTime()));       //initialize the monthLabel as a new JLabel with the text set to the current month
+        rightPanel.add(monthLabel, BorderLayout.NORTH);                 //add the monthLabel to the north slot of the rightPanel
     }
     
     /**
@@ -667,137 +715,200 @@ public class AppointmentFrame extends JFrame
      */
     private void createCalendar()
     {
-        calendarPanel = new JPanel(new BorderLayout());
+        calendarPanel = new JPanel(new BorderLayout());                 //initialize the calendarPanel as a new JPanel with a BorderLayout
         
-        calendarSubPanelA = new JPanel(new GridLayout(1, 7));
-        for(int i = 0; i < 7; i++)
+        calendarSubPanelA = new JPanel(new GridLayout(1, 7));           //initialize the first subPanel as a new JPanel with a 1x7 GridLayout
+        for(int i = 0; i < 7; i++)                                      //for every slot in the subPanel
         {
-            if(i != 0)
+            if(i != 0)                                                  //if i is not 0
             {
-                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[i-1].getDisplayName(TextStyle.SHORT, Locale.CANADA)));
+                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[i-1].getDisplayName(TextStyle.SHORT, Locale.CANADA)));  //add a new JLabel to the current slot in the JPanel with the day of the week
             }
-            else
+            else                                                        //if i is 0
             {
-                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[6].getDisplayName(TextStyle.SHORT, Locale.CANADA)));
+                calendarSubPanelA.add(new JLabel(DayOfWeek.values()[6].getDisplayName(TextStyle.SHORT, Locale.CANADA)));    //add a new JLabel to the 0th position with the label for sunday
             }
         }
-        calendarPanel.add(calendarSubPanelA, BorderLayout.NORTH);
+        calendarPanel.add(calendarSubPanelA, BorderLayout.NORTH);       //add the subpanel to the north part of the calendarPanel
         
-        int counter = 0;
+        int counter = 0;                                                //count the number of days added to the calendar
         
-        calendarSubPanelB = new JPanel(new GridLayout(6, 7));
-        int currentYear = date.get(Calendar.YEAR);
-        int currentMonth = date.get(Calendar.MONTH);
-        int previousMonth = currentMonth - 1;
-        int nextMonth = currentMonth + 1;
-        int currentDay = date.get(Calendar.DAY_OF_MONTH);
-        Calendar currentMonthCalendar = new GregorianCalendar(currentYear, currentMonth, 1);
-        int remainingDays = currentMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-        int numberOfDays = currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        Calendar previousMonthCalendar = new GregorianCalendar(currentYear, previousMonth, 1);
-        previousMonthCalendar.set(Calendar.DAY_OF_MONTH, previousMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        Calendar nextMonthCalendar = new GregorianCalendar(currentYear, nextMonth, 1);
-        currentMonthCalendar.set(Calendar.DAY_OF_MONTH, currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        int leftoverDays = 7 - currentMonthCalendar.get(Calendar.DAY_OF_WEEK);
-        while(remainingDays > 0)
+        calendarSubPanelB = new JPanel(new GridLayout(6, 7));           //initialize the second subPanel as a new JPanel with a 6x7 GridLayout
+        int currentYear = date.get(Calendar.YEAR);                      //store the currentYear
+        int currentMonth = date.get(Calendar.MONTH);                    //currentMonth
+        int previousMonth = currentMonth - 1;                           //previousMonth
+        int nextMonth = currentMonth + 1;                               //nextMonth
+        int currentDay = date.get(Calendar.DAY_OF_MONTH);               //currentDay
+        Calendar currentMonthCalendar = new GregorianCalendar(currentYear, currentMonth, 1);    //create a new Calendar for the current month starting at 1
+        int remainingDays = currentMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;                 //get the remaining days in the current week
+        int numberOfDays = currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);        //get the total number of days in the month
+        Calendar previousMonthCalendar = new GregorianCalendar(currentYear, previousMonth, 1);  //create a new Calendar for the previous month starting at 1
+        previousMonthCalendar.set(Calendar.DAY_OF_MONTH, previousMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));    //set the date to the last day of the month
+        Calendar nextMonthCalendar = new GregorianCalendar(currentYear, nextMonth, 1);      //create another new Calendar for the next month
+        currentMonthCalendar.set(Calendar.DAY_OF_MONTH, currentMonthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));      //set the currentMonthCalendara to the last day of the month
+        int leftoverDays = 7 - currentMonthCalendar.get(Calendar.DAY_OF_WEEK);              //store the remaining days in that week
+        while(remainingDays > 0)                                                            //while there are days remaining in the previous month
         {
-            int i = previousMonthCalendar.get(Calendar.DAY_OF_MONTH) - remainingDays + 1;
-            JButton calendarButton = new JButton(Integer.toString(i));
-            calendarButton.setBackground(Color.GRAY);
-            class CalendarButtonListener implements ActionListener
+            int i = previousMonthCalendar.get(Calendar.DAY_OF_MONTH) - remainingDays + 1;   //the day of the previous month
+            JButton calendarButton = new JButton(Integer.toString(i));                      //create a new JButton
+            calendarButton.setBackground(Color.GRAY);                                       //set the colour of the JButton to grey
+            for(int j = 0; j < appointments.size(); j++)                                    //for every appointment
             {
-                public void actionPerformed(ActionEvent e)
+                if(appointments.get(j).getDate().get(Calendar.MONTH) == previousMonth &&    //if the appointment occurs on the day of the button
+                    appointments.get(j).getDate().get(Calendar.DAY_OF_MONTH) == i)
                 {
-                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)-1);
-                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
-                    monthLabel.setText(sdfMonth.format(date.getTime()));
-                    dateLabel.setText(sdf.format(date.getTime()));
-                    calendarPanel.removeAll();
-                    createCalendar();
-                    calendarPanel.revalidate();
+                    calendarButton.setBorder(new LineBorder(Color.ORANGE));                 //add an orange border to the button
+                    break;                                                                  //break the loop
                 }
-            }
-            calendarButton.addActionListener(new CalendarButtonListener());
-            calendarSubPanelB.add(calendarButton);
-            remainingDays--;
-            counter++;
-        }
-        for(int i = 1; i <= numberOfDays; i++)
-        {
-            JButton calendarButton = new JButton(Integer.toString(i));
-            if(currentDay == Integer.parseInt(calendarButton.getText()))
-            {
-                calendarButton.setBackground(Color.RED);
             }
             class CalendarButtonListener implements ActionListener
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(ActionEvent e)                                  //override the actionPerformed method from the interface ActionListener
                 {
+                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)-1);                   //set the date to the one represented by the button
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
-                    monthLabel.setText(sdfMonth.format(date.getTime()));
-                    dateLabel.setText(sdf.format(date.getTime()));
-                    calendarPanel.removeAll();
-                    createCalendar();
-                    calendarPanel.revalidate();
+                    monthLabel.setText(sdfMonth.format(date.getTime()));                    //set the monthLabel to the new date
+                    dateLabel.setText(sdf.format(date.getTime()));                          //set the dateLabel to the new date
+                    getTodaysAppointments();                                                //check for appointments on the day and redraw the calendar
                 }
             }
-            calendarButton.addActionListener(new CalendarButtonListener());
-            calendarSubPanelB.add(calendarButton);
-            counter++;
+            calendarButton.addActionListener(new CalendarButtonListener());                 //add the actionListener to the button
+            calendarSubPanelB.add(calendarButton);                                          //add the button to the calendarSubPanelb
+            remainingDays--;                                                                //decrement remainingDays
+            counter++;                                                                      //increment the counter
         }
-        while(leftoverDays > 0)
+        for(int i = 1; i <= numberOfDays; i++)                                              //for every day in the current month
         {
-            int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);
-            JButton calendarButton = new JButton(Integer.toString(i));
-            nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);
-            calendarButton.setBackground(Color.GRAY);
+            JButton calendarButton = new JButton(Integer.toString(i));                      //create a new JButton with a label containing the current day of the month
+            if(currentDay == Integer.parseInt(calendarButton.getText()))                    //if the text in the button matches the current day of the month
+            {
+                calendarButton.setBackground(Color.RED);                                    //set the colour of the button to red
+            }
+            for(int j = 0; j < appointments.size(); j++)                                    //for every appointment
+            {
+                if(appointments.get(j).getDate().get(Calendar.MONTH) == currentMonth &&     //if there is an appointment on the day the button represents
+                    appointments.get(j).getDate().get(Calendar.DAY_OF_MONTH) == i)
+                {
+                    calendarButton.setBorder(new LineBorder(Color.ORANGE));                 //add an orange outline to the button
+                    break;                                                                  //break the loop
+                }
+            }
+            class CalendarButtonListener implements ActionListener
+            {
+                public void actionPerformed(ActionEvent e)                                  //override the actionPerformed method from the ActionListener interface
+                {
+                    date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));    //set the date to the one represented by the button
+                    //monthLabel.setText(sdfMonth.format(date.getTime()));                            //set the monthLabel to the new date
+                    dateLabel.setText(sdf.format(date.getTime()));                                  //set the dateLabel to the new date
+                    getTodaysAppointments();                                                        //get the new dates appointments and redraw the calendar
+                }
+            }
+            calendarButton.addActionListener(new CalendarButtonListener());                 //add the actionListener to the button
+            calendarSubPanelB.add(calendarButton);                                          //add the JButton to the calendarSubPanel
+            counter++;                                                                      //incrememnt the counter
+        }
+        while(leftoverDays > 0)                                                             //while there are leftover days
+        {
+            int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);                           //store the first day of the next month in i
+            JButton calendarButton = new JButton(Integer.toString(i));                      //create a new JButton with the label representing the day of the month
+            nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);     //set the calendar to the next day
+            calendarButton.setBackground(Color.GRAY);                                       //set the colour of the button to grey
+            for(int j = 0; j < appointments.size(); j++)                                    //for every appointment
+            {
+                if(appointments.get(j).getDate().get(Calendar.MONTH) == nextMonth &&        //if the date of the appointment matches the date represented by the button
+                    appointments.get(j).getDate().get(Calendar.DAY_OF_MONTH) == i)
+                {
+                    calendarButton.setBorder(new LineBorder(Color.ORANGE));                 //add an orange border to the button
+                    break;                                                                  //break from the loop
+                }
+            }
             class CalendarActionListener implements ActionListener
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(ActionEvent e)                                  //override the actionPerformed method from the ActionListener interface
                 {
-                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
+                    date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);                   //set the date to the date represented by the button
                     date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
-                    monthLabel.setText(sdfMonth.format(date.getTime()));
-                    dateLabel.setText(sdf.format(date.getTime()));
-                    calendarPanel.removeAll();
-                    createCalendar();
-                    calendarPanel.revalidate();
+                    monthLabel.setText(sdfMonth.format(date.getTime()));                    //set the monthLabel to the new date
+                    dateLabel.setText(sdf.format(date.getTime()));                          //set the dateLabel to the new date
+                    getTodaysAppointments();                                                //get today's appointments and redraw the calendar
                 }
             }
-            calendarButton.addActionListener(new CalendarActionListener());
-            calendarSubPanelB.add(calendarButton);
-            leftoverDays--;
-            counter++;
+            calendarButton.addActionListener(new CalendarActionListener());                 //add the actionListener to the button
+            calendarSubPanelB.add(calendarButton);                                          //add the JButton to the subPanel
+            leftoverDays--;                                                                 //decrement leftoverDays
+            counter++;                                                                      //increment counter
         }
-        if(counter % 6 != 0)
+        if(counter % 6 != 0)                                                                //if counter is not an integer multiple of 6
         {
-            for(int j = 0; j < 7; j++)
+            for(int j = 0; j < 7; j++)                                                      //add another weeks worth of buttons
             {
-                int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);
-                JButton calendarButton = new JButton(Integer.toString(i));
-                nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);
-                calendarButton.setBackground(Color.GRAY);
-                class CalendarActionListener implements ActionListener
+                int i = nextMonthCalendar.get(Calendar.DAY_OF_MONTH);                       //store the current day of the next month in i
+                JButton calendarButton = new JButton(Integer.toString(i));                  //create a new JButton with label corresponding to the day of the month
+                nextMonthCalendar.set(Calendar.DAY_OF_MONTH, nextMonthCalendar.get(Calendar.DAY_OF_MONTH) + 1);     //set the nextMonthCalendar to the next day
+                calendarButton.setBackground(Color.GRAY);                                   //set the colour of the button to grey
+                for(int k = 0; k < appointments.size(); k++)                                //for every appointment
                 {
-                    public void actionPerformed(ActionEvent e)
+                    if(appointments.get(k).getDate().get(Calendar.MONTH) == nextMonth &&    //if the dates are the same
+                        appointments.get(k).getDate().get(Calendar.DAY_OF_MONTH) == i)
                     {
-                        date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);
-                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
-                        monthLabel.setText(sdfMonth.format(date.getTime()));
-                        dateLabel.setText(sdf.format(date.getTime()));
-                        calendarPanel.removeAll();
-                        createCalendar();
-                        calendarPanel.revalidate();
+                        calendarButton.setBorder(new LineBorder(Color.ORANGE));             //add an orange border to the button
+                        break;                                                              //break from the loop
                     }
                 }
-                calendarButton.addActionListener(new CalendarActionListener());
-                calendarSubPanelB.add(calendarButton);
-                leftoverDays--;
+                class CalendarActionListener implements ActionListener
+                {
+                    public void actionPerformed(ActionEvent e)                              //override actionPerformed method from the ActionListener interface
+                    {
+                        date.set(Calendar.MONTH, date.get(Calendar.MONTH)+1);               //set the date to the one represented by the button
+                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(calendarButton.getText()));
+                        monthLabel.setText(sdfMonth.format(date.getTime()));                //set the monthLabel to the new date
+                        dateLabel.setText(sdf.format(date.getTime()));                      //set the dateLabel to the new date
+                        getTodaysAppointments();                                            //get the day's appointments and refresh the calendar
+                    }
+                }
+                calendarButton.addActionListener(new CalendarActionListener());             //add the ActionListener to the JButton
+                calendarSubPanelB.add(calendarButton);                                      //add the button to the subPanel
+                leftoverDays--;                                                             //decrement leftoverDays
             }
         }
         
-        calendarPanel.add(calendarSubPanelB, BorderLayout.CENTER);
-        rightPanel.add(calendarPanel);
+        calendarPanel.add(calendarSubPanelB, BorderLayout.CENTER);                          //add the calendar to the center of the calendarPanel
+        
+        calendarSubPanelC = new JPanel();
+        
+        leftMonthButton = new JButton("Prev");
+        class LeftMonthActionListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                date.set(Calendar.MONTH, date.get(Calendar.MONTH) - 1);
+                date.set(Calendar.DAY_OF_MONTH, 1);
+                monthLabel.setText(sdfMonth.format(date.getTime()));
+                dateLabel.setText(sdf.format(date.getTime()));
+                getTodaysAppointments();
+            }
+        }
+        leftMonthButton.addActionListener(new LeftMonthActionListener());
+        calendarSubPanelC.add(leftMonthButton);
+        
+        rightMonthButton = new JButton("Next");
+        class RightMonthActionListener implements ActionListener
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                date.set(Calendar.MONTH, date.get(Calendar.MONTH) + 1);
+                date.set(Calendar.DAY_OF_MONTH, 1);
+                monthLabel.setText(sdfMonth.format(date.getTime()));
+                dateLabel.setText(sdf.format(date.getTime()));
+                getTodaysAppointments();
+            }
+        }
+        rightMonthButton.addActionListener(new RightMonthActionListener());
+        calendarSubPanelC.add(rightMonthButton);
+        
+        calendarPanel.add(calendarSubPanelC, BorderLayout.SOUTH);
+        
+        rightPanel.add(calendarPanel);                                                      //add the calendarPanel to the rightPanel
     }
     
     /**
@@ -805,10 +916,10 @@ public class AppointmentFrame extends JFrame
      */
     private void createContactDescriptionPanel()
     {
-        contactDescriptionPanel = new JPanel(new BorderLayout());
-        createContactPanel();
-        createDescriptionPanel();
-        rightPanel.add(contactDescriptionPanel, BorderLayout.SOUTH);
+        contactDescriptionPanel = new JPanel(new BorderLayout());       //initialize contactDescriptionPanel to a new JPanel with a BorderLayout
+        createContactPanel();                                           //run the creatContactPanel method
+        createDescriptionPanel();                                       //run the createDescriptionPanel method
+        rightPanel.add(contactDescriptionPanel, BorderLayout.SOUTH);    //add the contactDescriptionPanel to the south part of the rightPanel 
     }
     
     /**
@@ -816,45 +927,44 @@ public class AppointmentFrame extends JFrame
      */
     private void createContactPanel()
     {
-        contactBorder = new TitledBorder("Contact");
-        contactBorder.setTitleJustification(TitledBorder.LEFT);
-        contactPanel = new JPanel(new BorderLayout());
-        contactPanel.setBorder(contactBorder);
+        contactBorder = new TitledBorder("Contact");                    //initialize contactBorder to a new TitledBorder with text "Contact"
+        contactBorder.setTitleJustification(TitledBorder.LEFT);         //set the justification of the border to left
+        contactPanel = new JPanel(new BorderLayout());                  //initialize contactPanel to a new JPanel with a BorderLayout
+        contactPanel.setBorder(contactBorder);                          //set the border of the contatPanel to the contactBorder
         
-        contactSubPanelA = new JPanel(new GridLayout(4, 2));
-        lastNameLabel = new JLabel("Last Name");
-        firstNameLabel = new JLabel("First Name");
-        contactSubPanelA.add(lastNameLabel);
-        contactSubPanelA.add(firstNameLabel);
-        lastNameInput = new JTextField();
-        firstNameInput = new JTextField();
-        contactSubPanelA.add(lastNameInput);
-        contactSubPanelA.add(firstNameInput);
-        telephoneLabel = new JLabel("Telephone");
-        emailLabel = new JLabel("email");
-        contactSubPanelA.add(telephoneLabel);
-        contactSubPanelA.add(emailLabel);
-        telephoneInput = new JTextField();
-        emailInput = new JTextField();
-        contactSubPanelA.add(telephoneInput);
-        contactSubPanelA.add(emailInput);
+        contactSubPanelA = new JPanel(new GridLayout(4, 2));            //initialize contactSubPanelA to a new JPanel with a 4x2 GridLayout
+        lastNameLabel = new JLabel("Last Name");                        //initialize lastNameLabel to a new JLabel with text "Last Name"
+        firstNameLabel = new JLabel("First Name");                      //initialize firstNameLabel to a new JLabel with text "FirstName"
+        contactSubPanelA.add(lastNameLabel);                            //add the lastNameLabel to contactSubPanelA
+        contactSubPanelA.add(firstNameLabel);                           //add the firstNameLabel to contactSubPanelA
+        lastNameInput = new JTextField();                               //initalize lastNameInput to a new JTextField
+        firstNameInput = new JTextField();                              //initialize firstNameInput to a new JTextField
+        contactSubPanelA.add(lastNameInput);                            //add the lastNameInput to contactSubPanelA
+        contactSubPanelA.add(firstNameInput);                           //add the firstNameInput to contactSubPanelA
+        telephoneLabel = new JLabel("Telephone");                       //initialize telephoneLabel to a new JLabel with text "Telephone"
+        emailLabel = new JLabel("email");                               //initialize emailLabel to a new JLabel with text "email"
+        contactSubPanelA.add(telephoneLabel);                           //add the telephoneLabel to the contactSubPanelA
+        contactSubPanelA.add(emailLabel);                               //add the emailLabel to the contactSubPanelA
+        telephoneInput = new JTextField();                              //initialize telephoneInput to a new JTextField
+        emailInput = new JTextField();                                  //initialize emailInput to a new JTextField
+        contactSubPanelA.add(telephoneInput);                           //add the telephoneInput to contactSubPanelA
+        contactSubPanelA.add(emailInput);                               //add the emailInput to contactSubPanelB
         
-        contactSubPanelB = new JPanel(new BorderLayout());
-        addressLabel = new JLabel("Address");
-        contactSubPanelB.add(addressLabel, BorderLayout.NORTH);
-        addressInput = new JTextField();
-        addressInput.setEditable(false);
-        contactSubPanelB.add(addressInput);
+        contactSubPanelB = new JPanel(new BorderLayout());              //initialize contactSubPanelB to a new JPanel with a BorderLayout
+        addressLabel = new JLabel("Address");                           //initialize addressLabel to a new JLabel with label "Address"
+        contactSubPanelB.add(addressLabel, BorderLayout.NORTH);         //add the addressLabel to the north part of contactSubPanelB
+        addressInput = new JTextField();                                //initialize the addressInput to a new JTextField
+        contactSubPanelB.add(addressInput);                             //add the addressInput to contactSubPanelB
         
-        contactSubPanelC = new JPanel();
-        createFindButton();
-        createClearButton();
+        contactSubPanelC = new JPanel();                                //initialize contactSubPanelC as a new JPanel
+        createFindButton();                                             //run the createFindButton method
+        createClearButton();                                            //run the createClearButton method
         
-        contactPanel.add(contactSubPanelA, BorderLayout.NORTH);
-        contactPanel.add(contactSubPanelB, BorderLayout.CENTER);
-        contactPanel.add(contactSubPanelC, BorderLayout.SOUTH);
+        contactPanel.add(contactSubPanelA, BorderLayout.NORTH);         //add contactSubPanelA to the north part of the contactPanel
+        contactPanel.add(contactSubPanelB, BorderLayout.CENTER);        //add contactSubPanelB to the center part of the contactPanel
+        contactPanel.add(contactSubPanelC, BorderLayout.SOUTH);         //add contactSubPanelC to the south part of the contactPanel
         
-        contactDescriptionPanel.add(contactPanel, BorderLayout.NORTH);
+        contactDescriptionPanel.add(contactPanel, BorderLayout.NORTH);  //add the contactPanel to the north part of the contactDescriptionPanel
     }
     
     /**
@@ -862,66 +972,55 @@ public class AppointmentFrame extends JFrame
      */
     private void createFindButton()
     {
-        findButton = new JButton("Find");
+        findButton = new JButton("Find");                               //initialize findButton to a new JButton with label "Find"
         class FindButtonListener implements ActionListener
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(ActionEvent e)                  //override the actionPerformed method from the ActionListener interface
             {
-                if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))
+                try                                                     //try
                 {
-                    try
+                    if(!(lastNameInput.getText().equals("") && firstNameInput.getText().equals("")))    //if neither the lastName input field nor the firstName input field are empty
                     {
-                        Person tmp = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());
-                        setFields(tmp);
+                        Person p = contacts.findPersonByName(lastNameInput.getText(), firstNameInput.getText());    //find a Person from the contacts object that matches
+                        setFields(p);                                   //set the fields to those from the found Person object
                     }
-                    catch(NullPointerException err)
+                    else if(!emailInput.getText().equals(""))           //if the email input field is not blank
                     {
-			System.out.println("1");
-                        description.setText("ERROR: CONTACT NOT FOUND");
+                        Person p = contacts.findPersonByEmail(emailInput.getText());        //search for a Person with a matching email
+                        setFields(p);                                   //set the fields to those from the found Person object
+                    }
+                    else if(!telephoneInput.getText().equals(""))       //if the phone number input field is not blank
+                    {
+                        Person p = contacts.findPersonByTelephone(telephoneInput.getText());    //search for a Person with a matching phone number
+                        setFields(p);                                   //set the fields to those from the found Person object
+                    }
+                    else                                                //if none of the above conditions are met
+                    {
+                        description.setText("ERROR: NO FIELDS WERE FILLED");    //set the description to an error
                     }
                 }
-                else if(!emailInput.getText().equals(""))
+                catch(NullPointerException err)                         //if one of the find methods return a null pointer
                 {
-                    try
-                    {
-                        Person tmp = contacts.findPersonByEmail(emailInput.getText());
-                        setFields(tmp);
-                    }
-                    catch(NullPointerException err)
-                    {
-                        System.out.println("2");
-                        description.setText("ERROR: CONTACT NOT FOUND");
-                    }
-                }
-                else if(!telephoneInput.getText().equals(""))
-                {
-                    try
-                    {
-                        Person tmp = contacts.findPersonByTelephone(telephoneInput.getText());
-                        setFields(tmp);
-                    }
-                    catch(NullPointerException err)
-                    {
-                        System.out.println("3");
-                        description.setText("ERROR: CONTACT NOT FOUND");
-                    }
-                }
-                else
-                {
-                    description.setText("ERROR: NO FIELDS WERE FILLED");
+                    description.setText("ERROR: CONTACT NOT FOUND");    //set the description to say that the contact was not found
                 }
             }
-            private void setFields(Person tmp)
+            /**
+             * sets the fields in the contact panel to those
+             * from the given Person object
+             * 
+             * @param p the Person object containing the data for the fields
+             */
+            private void setFields(Person p)
             {
-                firstNameInput.setText(tmp.getFirstName());
-                lastNameInput.setText(tmp.getLastName());
-                addressInput.setText(tmp.getAddress());
-                telephoneInput.setText(tmp.getTelephone());
-                emailInput.setText(tmp.getEmail());
+                firstNameInput.setText(p.getFirstName());
+                lastNameInput.setText(p.getLastName());
+                addressInput.setText(p.getAddress());
+                telephoneInput.setText(p.getTelephone());
+                emailInput.setText(p.getEmail());
             }
         }
-        findButton.addActionListener(new FindButtonListener());
-        contactSubPanelC.add(findButton);
+        findButton.addActionListener(new FindButtonListener());         //add the ActionListener to the findButton
+        contactSubPanelC.add(findButton);                               //add the findButton to contactSubPanelC
     }
     
     /**
@@ -929,20 +1028,21 @@ public class AppointmentFrame extends JFrame
      */
     private void createClearButton()
     {
-        clearButton = new JButton("Clear");
+        clearButton = new JButton("Clear");                             //initialize clearButton as a new JButton with label "Clear"
         class ClearButtonListener implements ActionListener
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(ActionEvent e)                  //override the actionPerformed method from the ActionListener interface
             {
-                lastNameInput.setText("");
-                firstNameInput.setText("");
-                telephoneInput.setText("");
+                lastNameInput.setText("");                              //clear all of the fields
+                firstNameInput.setText("");                             //including the description
+                telephoneInput.setText("");                             //box
                 emailInput.setText("");
                 addressInput.setText("");
+                description.setText("");
             }
         }
-        clearButton.addActionListener(new ClearButtonListener());
-        contactSubPanelC.add(clearButton);
+        clearButton.addActionListener(new ClearButtonListener());       //add the ActionListener to the clearButton
+        contactSubPanelC.add(clearButton);                              //add clearButton to contactSubPanelC
     }
     
     /**
@@ -957,7 +1057,7 @@ public class AppointmentFrame extends JFrame
         
         description = new JTextArea(6, 10);                                             //create a new JTextArea with 4 rows and 10 columns
         descriptionPanel.add(description, BorderLayout.CENTER);                         //add the description JTextArea to the center of the descriptionPanel
-        contactDescriptionPanel.add(descriptionPanel, BorderLayout.SOUTH);                         //add the descriptionPanel to the south of the controlPanel
+        contactDescriptionPanel.add(descriptionPanel, BorderLayout.SOUTH);              //add the descriptionPanel to the south of the controlPanel
     }
     
 }

@@ -18,27 +18,43 @@ public class Appointment implements Comparable<Appointment>                     
         this.description = description;                                                         //set the description to point to the same String as the one provided
     }
     
-    public Appointment(int year, int month, int day, int hour, int minute, String description,
-                       String lastName, String firstName, String telephone, String address, String email)
+    public Appointment(int year, int month, int day, int hour, int minute, String description,              //second constructor takes same parameters as
+                       String lastName, String firstName, String address, String telephone, String email)   //above and also parameters for a Person object
     {
-        this(year, month, day, hour, minute, description);
-        person = new Person(lastName, firstName, telephone, address, email);
+        this(year, month, day, hour, minute, description);                                                  //calls the other constructor method
+        person = new Person(lastName, firstName, address, telephone, email);                                //initializes the Person object
     }
     
+    /**
+     * gets the Person object
+     * 
+     * @return the object's Person object
+     */
     public Person getPerson()
     {
-        return person;
+        return person;                                                  //return the Person object
     }
     
-    public void setPerson(String lastName, String firstName, String telephone, String address, String email)
+    /**
+     * sets the person variable to point
+     * to a new Person object with the given parameters
+     * 
+     * @param lastName the lastname for the new Person
+     * @param firstName the firstname for the new Person
+     * @param address the address for the new Person
+     * @param telephone the phone number for the new Person
+     * @param email the email address for the new Person
+     */
+    public void setPerson(String lastName, String firstName, String address, String telephone, String email)
     {
-        person = new Person(lastName, firstName, telephone, address, email);
+        person = new Person(lastName, firstName, address, telephone, email);        //set the person instance variable to point to a new Person with given parameters
     }
     
     /**
      * method to return the
      * description of the
      * appointment
+     * 
      * @return the description
      */
     public String getDescription()
@@ -50,6 +66,7 @@ public class Appointment implements Comparable<Appointment>                     
      * method to set the
      * description of the
      * appointment
+     * 
      * @param newDescription the new description for the appointment
      */
     public void setDescription(String newDescription)
@@ -61,6 +78,7 @@ public class Appointment implements Comparable<Appointment>                     
      * method to return
      * the date of the
      * appointment
+     * 
      * @return the date of the appointment
      */
     public Calendar getDate()
@@ -71,6 +89,7 @@ public class Appointment implements Comparable<Appointment>                     
     /**
      * method to set the date
      * of the appointment
+     * 
      * @param year the year to set the appointment to
      * @param month the month to set the appointment to
      * @param day the day to set the appointment to
@@ -87,23 +106,36 @@ public class Appointment implements Comparable<Appointment>                     
      * the time and
      * description of the
      * appointment
+     * 
      * @return a string containing the time and description of the appointment
      */
     public String print()
     {
         String hour = Integer.toString(date.get(Calendar.HOUR_OF_DAY));             //variable to store the hour
         String minute = Integer.toString(date.get(Calendar.MINUTE));                //variable to store the minute
-        if(minute.length() == 1)                                                    //check if the minute is only 1 digit
+        String message = "";                                                        //a blank string for the message
+        if(Integer.parseInt(hour) < 10)                                                      //if the hour is smaller than 10
         {
-            return hour + ":0" + minute + ' ' + description;                        //if yes, add a zero before the minutes and return the string
+            message += "0";                                                         //append a zero to the message
         }
-        return hour + ':' + minute + ' ' + description;                             //otherwise return the standard string
+        message += hour + ":";                                                      //append the hour and a colon to the message
+        if(Integer.parseInt(minute) < 10)                                                    //if the minutes are below 10
+        {
+            message += "0";                                                         //append a zero to the message
+        }
+        message += minute + " " + description;                                      //append the minutes and the description to the message
+        if(person == null)                                                          //if the Person pbject was not initialized
+        {
+            return message;                                                         //return the message
+        }
+        return message + " WITH:\n" + person;                                       //otherwise return the message with the details of the Person
     }
     
     /**
      * method to check if the
      * appointment occurs on
      * the same date
+     * 
      * @param year the year to be compared
      * @param month the month to be compared
      * @param day the day to be compared
@@ -114,13 +146,14 @@ public class Appointment implements Comparable<Appointment>                     
     public boolean occursOn(int year, int month, int day, int hour, int minute)
     {
         Calendar otherDate = new GregorianCalendar(year, month-1, day, hour, minute);     //make another GregorianCalendar object
-        return date.compareTo(otherDate) == 0;                                          //return if the two dates are the same
+        return date.compareTo(otherDate) == 0;                                            //return if the two dates are the same
     }
     
     /**
      * override the method
      * compareTo from interface
      * Comparable
+     * 
      * @param other the object to be compare to
      * @return an integer to show the position relative to the other object
      */
